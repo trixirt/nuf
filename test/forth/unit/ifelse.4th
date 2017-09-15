@@ -1,0 +1,11 @@
+: CHECK
+  0=
+  IF
+    ."TRUE"
+  ELSE
+    ."FALSE"
+  THEN
+;
+
+0 CHECK (TRUE)
+1 CHECK (FALSE)

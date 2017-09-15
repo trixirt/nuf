@@ -1,0 +1,270 @@
+%name FORTHParse
+%token_type { std::shared_ptr<N>  }
+%token_destructor { /* Not needed with shared_ptr */  }
+%extra_argument { Forth *forth }
+%token_prefix FORTH_
+
+//
+// ASCII
+// See rfc 20
+// ascii 01 - 0f
+%nonassoc     SOH STX ETX EOT ENQ ACK BEL BS  HT  LF  VT  FF  CR  SO  SI.
+// ascii 10 - 1f
+%nonassoc DLE DC1 DC2 DC3 DC4 NAK SYN ETB CAN EM  SUB ES  FS  GS  RS  US.
+// ascii 20 - 2f
+//             !   "   #   $   %   &   '   (   }   *   +   ,   -   .   /
+%nonassoc SP  EXL DQU HAS DOL PER AMP SQU OPA CPA MUL PLU COM MIN DOT SL.
+// ascii 30 - 3f
+//         0   1   2   3   4   5   6   7   8   9   :   ;   <   =   >   ?
+%nonassoc DD0 DD1 DD2 DD3 DD4 DD5 DD6 DD7 DD8 DD9 COL SCO LES EQU GRT QUE.
+// ascii 40 - 4f
+//         @   A   B   C   D   E   F   G   H   I   J   K   L   M   N   O
+%nonassoc AT  UUA UUB UUC UUD UUE UUF UUG UUH UUI UUJ UUK UUL UUM UUN UUO.
+// ascii 50 - 5f
+//         P   Q   R   S   T   U   V   W   X   Y   Z   [   \   ]   ^   _
+%nonassoc UUP UUQ UUR UUS UUT UUU UUV UUW UUX UUY UUZ OBK BSL CBK CAR UND.
+// ascii 60 - 6f
+//         `   a   b   c   d   e   f   g   h   i   j   k   l   m   n   o
+%nonassoc GRA LLA LLB LLC LLD LLE LLF LLG LLH LLI LLJ LLK LLL LLM LLN LLO.
+// ascii 70 - 7f
+//         p   q   r   s   t   u   v   w   x   y   z   {   |   }   ~
+%nonassoc LLP LLQ LLR LLS LLT LLU LLV LLW LLX LLY LLZ OBR VER CBR TIL DEL.
+
+// FORTH keywords
+%nonassoc TODO DEFINE FALSE IDENTIFIER_GLOBAL IDENTIFIER_LOCAL RET SELECT TRUE GLOBAL CONSTANT.
+%nonassoc COMMENT NUMBER EXTERNALLY_INITIALIZED ADDRSPACE POSITIVE_DECIMAL.
+%nonassoc LEX_ERROR ELLIPSIS.
+
+// fake tokens
+%nonassoc LITERAL BUILTIN WHITESPACE.
+
+%include {
+#include <iostream>
+#include "forth.h"
+#include "ast.h"
+
+// To silence 
+// src/parse/forth.c: warning: unused variable 'forth' [-Wunused-variable]
+#pragma clang diagnostic ignored "-Wunused-variable"
+
+}
+
+%syntax_error {
+  forth->syntax_error();
+  //    fprintf(stderr, "%p %d Syntax error\n", (void *)yypParser, yymajor);
+}
+
+%parse_failure {
+    fprintf(stderr,"Giving up.  Parser is hopelessly lost...\n");
+}
+
+%start_symbol program
+
+%type statement            { std::shared_ptr<Statement>       }
+%type simple_statement     { std::shared_ptr<SimpleStatement> }
+%type statement_list       { std::shared_ptr<StatementList> }
+%type if_statement         { std::shared_ptr<IfStatement> }
+%type if_else_statement    { std::shared_ptr<IfElseStatement>    }
+%type inc_loop_statement   { std::shared_ptr<IncLoopStatement>   }
+%type until_loop_statement { std::shared_ptr<UntilLoopStatement> }
+%type loop_statement       { std::shared_ptr<LoopStatement> }
+%type check_loop_statement { std::shared_ptr<CheckLoopStatement> }
+%type call_statement       { std::shared_ptr<CallStatement> }
+%type constant_definition  { std::shared_ptr<ConstantDefinition> }
+%type variable_definition  { std::shared_ptr<VariableDefinition> }
+%type symbol_definition    { std::shared_ptr<SymbolDefinition> }
+%type op                   { std::shared_ptr<Op> }
+%type symbol               { std::shared_ptr<Symbol> }
+%type function_definition       { std::shared_ptr<FunctionDefinition> }
+%type function_definition_list  { std::shared_ptr<FunctionDefinitionList> }
+%type number                    { std::shared_ptr<Number> }
+%type function_call             { std::shared_ptr<FunctionCall> }
+
+program ::= . {
+  forth->_program = std::shared_ptr<Program> (new Program());
+}
+
+program ::= statement_list(A). {  
+  forth->_program = std::shared_ptr<Program> (new Program(A));
+}
+program ::= function_definition_list(A). {
+  forth->_program = std::shared_ptr<Program> (new Program(A));
+}
+program ::= function_definition_list(A) statement_list(B). {
+  forth->_program = std::shared_ptr<Program> (new Program(A, B));
+}
+
+statement(X) ::= if_statement(A).         { X = A; }
+statement(X) ::= if_else_statement(A).    { X = A; }
+statement(X) ::= inc_loop_statement(A).   { X = A; } 
+statement(X) ::= until_loop_statement(A).   { X = A; } 
+statement(X) ::= loop_statement(A).       { X = A; } 
+statement(X) ::= check_loop_statement(A). { X = A; } 
+statement(X) ::= simple_statement(A).     { X = A; }
+
+statement_list(X) ::= statement(A). {  X = std::shared_ptr<StatementList> (new StatementList(A));  }
+statement_list ::= statement_list(A) statement(B). { A->append(B); }
+
+loop_statement(X) ::= BEGIN statement_list(A) AGAIN.                                {  X = std::shared_ptr<LoopStatement> (new LoopStatement(A));  }
+until_loop_statement(X) ::= BEGIN statement_list(A) UNTIL.                                {  X = std::shared_ptr<UntilLoopStatement> (new UntilLoopStatement(A));  }
+check_loop_statement(X) ::= BEGIN statement_list(A) WHILE statement_list(B) REPEAT. {  X = std::shared_ptr<CheckLoopStatement> (new CheckLoopStatement(A,B));  }
+inc_loop_statement(X) ::= DO statement_list(A) LOOP.                                    {  X = std::shared_ptr<IncLoopStatement> (new IncLoopStatement(A));  }
+inc_loop_statement(X) ::= DO statement_list(A) NUMBER(B) LOOP_PLUS.                     {  X = std::shared_ptr<IncLoopStatement> (new IncLoopStatement(A,B));  }
+if_statement(X) ::= IF statement_list(A) THEN.                                      {  X = std::shared_ptr<IfStatement> (new IfStatement(A));  }
+if_else_statement(X) ::= IF statement_list(A) ELSE statement_list(B) THEN.          {  X = std::shared_ptr<IfElseStatement> (new IfElseStatement(A,B));  }
+
+
+// 6.1.0090
+op(X) ::= MUL .                                              { X = std::shared_ptr<MultiplyOp> (new MultiplyOp()); }
+// 6.1.0100
+op(X) ::= MULDIV .                                           { X = std::shared_ptr<MultiplyDivideOp> (new MultiplyDivideOp()); }
+// 6.1.0110
+op(X) ::= MULDIVMOD .                                        { X = std::shared_ptr<MultiplyDivideModuloOp> (new MultiplyDivideModuloOp()); }
+// 6.1.0120
+op(X) ::= PLUS .                                             { X = std::shared_ptr<PlusOp> (new PlusOp()); }
+// 6.1.0160
+op(X) ::= MINUS .                                            { X = std::shared_ptr<MinusOp> (new MinusOp()); }
+// 6.1.0180
+op(X) ::= DOT .                                              { X = std::shared_ptr<DotOp> (new DotOp()); }
+// 6.1.0230
+op(X) ::= SL .                                               { X = std::shared_ptr<DivideOp> (new DivideOp()); }
+// 6.1.0240
+op(X) ::= DIVMOD .                                           { X = std::shared_ptr<DivideModuloOp> (new DivideModuloOp()); }
+// 6.1.0250
+op(X) ::= LTZERO .                                           { X = std::shared_ptr<LessThanZeroOp> (new LessThanZeroOp()); }
+// 6.1.0270
+op(X) ::= EQZERO .                                           { X = std::shared_ptr<EqualsZeroOp> (new EqualsZeroOp()); }
+// 6.1.0290
+op(X) ::= INC .                                              { X = std::shared_ptr<IncOp> (new IncOp()); }
+// 6.1.0300
+op(X) ::= DEC .                                              { X = std::shared_ptr<DecOp> (new DecOp()); }
+// 6.1.0480
+op(X) ::= LTSIGNED .                                         { X = std::shared_ptr<LessThanSignedOp> (new LessThanSignedOp()); }
+// 6.1.0540
+op(X) ::= GTSIGNED .                                         { X = std::shared_ptr<GreaterThanSignedOp> (new GreaterThanSignedOp()); }
+// 6.1.0580
+op(X) ::= TOR .                                              { X = std::shared_ptr<ToReturnOp> (new ToReturnOp()); }
+// 6.1.0690
+// ABS is in the compiler's dictionary
+// 6.1.0705
+op(X) ::= ALIGN .                                            { X = std::shared_ptr<AlignOp> (new AlignOp()); }
+// 6.1.0750
+op(X) ::= BASE .                                             { X = std::shared_ptr<BaseOp> (new BaseOp()); }
+// 6.1.0770
+op(X) ::= BL .                                               { X = std::shared_ptr<BlOp> (new BlOp()); }
+// 6.1.0990
+op(X) ::= CR .                                               { X = std::shared_ptr<CrOp> (new CrOp()); }
+// 6.1.1170
+op(X) ::= DECIMAL .                                          { X = std::shared_ptr<DecimalOp> (new DecimalOp()); }
+// 6.1.1200
+op(X) ::= DEPTH .                                            { X = std::shared_ptr<DepthOp> (new DepthOp()); }
+// 6.1.1260
+op(X) ::= DROP .                                             { X = std::shared_ptr<DropOp> (new DropOp()); }
+// 6.1.1290
+op(X) ::= DUP .                                              { X = std::shared_ptr<DupOp> (new DupOp()); }
+// 6.1.1320
+op(X) ::= EMIT .                                             { X = std::shared_ptr<EmitOp> (new EmitOp()); }
+// 6.1.1650
+op(X) ::= HERE .                                             { X = std::shared_ptr<HereOp> (new HereOp()); }
+// 6.1.1660
+op(X) ::= HEX .                                              { X = std::shared_ptr<HexOp> (new HexOp()); }
+// 6.1.1680
+op(X) ::= I .                                                { X = std::shared_ptr<IOp> (new IOp()); }
+// 6.1.1720
+op(X) ::= INVERT .                                           { X = std::shared_ptr<InvertOp> (new InvertOp()); }
+// 6.1.1730
+op(X) ::= J .                                                { X = std::shared_ptr<JOp> (new JOp()); }
+// 6.1.1750
+op(X) ::= KEY .                                              { X = std::shared_ptr<KeyOp> (new KeyOp()); }
+// 6.1.1760
+op(X) ::= LEAVE .                                            { X = std::shared_ptr<LeaveOp> (new LeaveOp()); }
+// 6.1.1805
+op(X) ::= LSHIFT .                                           { X = std::shared_ptr<LeftShiftOp> (new LeftShiftOp()); }
+// 6.1.1870
+op(X) ::= MAX .                                              { X = std::shared_ptr<MaxOp> (new MaxOp()); }
+// 6.1.1880
+op(X) ::= MIN .                                              { X = std::shared_ptr<MinOp> (new MinOp()); }
+// 6.1.1890
+op(X) ::= MOD .                                              { X = std::shared_ptr<ModuloOp> (new ModuloOp()); }
+// 6.1.1910
+op(X) ::= NEGATE .                                           { X = std::shared_ptr<NegateOp> (new NegateOp()); }
+// 6.1.1980
+op(X) ::= OR .                                               { X = std::shared_ptr<OrOp> (new OrOp()); }
+// 6.1.1990
+op(X) ::= OVER .                                             { X = std::shared_ptr<OverOp> (new OverOp()); }
+// 6.1.2060
+op(X) ::= FROMR .                                            { X = std::shared_ptr<FromReturnOp> (new FromReturnOp()); }
+// 6.1.2070
+op(X) ::= STORER .                                           { X = std::shared_ptr<StoreReturnOp> (new StoreReturnOp()); }
+// 6.1.2160
+op(X) ::= ROT .                                              { X = std::shared_ptr<RotateOp> (new RotateOp()); }
+// 6.1.2162
+op(X) ::= RSHIFT .                                           { X = std::shared_ptr<RightShiftOp> (new RightShiftOp()); }
+// 6.1.2170
+op(X) ::= STOD .                                             { X = std::shared_ptr<SToDOp> (new SToDOp()); }
+// 6.1.2220
+op(X) ::= SPACE .                                            { X = std::shared_ptr<SpaceOp> (new SpaceOp()); }
+// 6.1.2230
+op(X) ::= SPACES .                                           { X = std::shared_ptr<SpacesOp> (new SpacesOp()); }
+// 6.1.2260
+op(X) ::= SWAP .                                             { X = std::shared_ptr<SwapOp> (new SwapOp()); }
+// 6.1.2320
+op(X) ::= UDOT .                                             { X = std::shared_ptr<UnsignedDotOp> (new UnsignedDotOp()); }
+// 6.1.2340
+op(X) ::= LTUNSIGNED .                                       { X = std::shared_ptr<LessThanUnsignedOp> (new LessThanUnsignedOp()); }
+// 6.1.2350
+op(X) ::= GTUNSIGNED .                                       { X = std::shared_ptr<GreaterThanUnsignedOp> (new GreaterThanUnsignedOp()); }
+// 6.1.2490
+op(X) ::= XOR .                                              { X = std::shared_ptr<ExclusiveOrOp> (new ExclusiveOrOp()); }
+
+
+op(X) ::= LITERAL(A) EXL .                                   { X = std::shared_ptr<StoreOp> (new StoreOp(A)); }
+op(X) ::= symbol(A) EXL .                                   { X = std::shared_ptr<StoreOp> (new StoreOp(A)); }
+op(X) ::= LITERAL(A) AT .                                    { X = std::shared_ptr<FetchOp> (new FetchOp(A)); }
+op(X) ::= symbol(A) AT .                                    { X = std::shared_ptr<FetchOp> (new FetchOp(A)); }
+// 6.1.0850
+op(X) ::= LITERAL(A) STORE_C .                               { X = std::shared_ptr<StoreCOp> (new StoreCOp(A)); }
+op(X) ::= symbol(A) STORE_C .                               { X = std::shared_ptr<StoreCOp> (new StoreCOp(A)); }
+// 6.1.0870
+op(X) ::= LITERAL(A) FETCH_C .                               { X = std::shared_ptr<FetchCOp> (new FetchCOp(A)); }
+op(X) ::= symbol(A) FETCH_C .                               { X = std::shared_ptr<FetchCOp> (new FetchCOp(A)); }
+
+// 6.1.0310
+op(X) ::= LITERAL(A) TWOSTORE .                                { X = std::shared_ptr<Store2Op> (new Store2Op(A)); }
+op(X) ::= symbol(A) TWOSTORE .                                { X = std::shared_ptr<Store2Op> (new Store2Op(A)); }
+
+
+// 6.2.1930
+op(X) ::= NIP .                                              { X = std::shared_ptr<NipOp> (new NipOp()); }
+// 6.2.2300
+op(X) ::= TUCK .                                              { X = std::shared_ptr<TuckOp> (new TuckOp()); }
+
+variable_definition(X) ::= VARIABLE symbol(A) .              { X = std::shared_ptr<VariableDefinition> (new VariableDefinition(A));  }
+constant_definition(X) ::= number(A) CONSTANT symbol(B) .    { X = std::shared_ptr<ConstantDefinition> (new ConstantDefinition(B,A)); /* xxx */}
+function_call(X) ::= symbol(A) . { X = std::shared_ptr<FunctionCall> (new FunctionCall(A)); }
+
+symbol(X) ::= SYMBOL(A) .                                    { X = std::dynamic_pointer_cast<Symbol>(A); }
+number(X) ::= NUMBER(A) .                                    { X = std::dynamic_pointer_cast<Number>(A); }
+string(X) ::= STRING(A) .                                    { X = std::dynamic_pointer_cast<String>(A); }
+
+simple_statement(X) ::= op(A) .                              { X = std::shared_ptr<SimpleStatement> (new SimpleStatement(A)); }
+simple_statement(X) ::= variable_definition(A) .             { X = std::shared_ptr<SimpleStatement> (new SimpleStatement(A)); }
+simple_statement(X) ::= constant_definition(A) .             { X = std::shared_ptr<SimpleStatement> (new SimpleStatement(A)); }
+simple_statement(X) ::= LITERAL(A) .                         { X = std::shared_ptr<SimpleStatement> (new SimpleStatement(A)); }
+simple_statement(X) ::= number(A) .                          { X = std::shared_ptr<SimpleStatement> (new SimpleStatement(A)); }
+simple_statement(X) ::= string(A) .                          { X = std::shared_ptr<SimpleStatement> (new SimpleStatement(A)); }
+simple_statement(X) ::= FALSE .                              { X = std::shared_ptr<SimpleStatement> (new SimpleStatement(std::shared_ptr<False> (new False()))); }
+simple_statement(X) ::= TRUE .                               { X = std::shared_ptr<SimpleStatement> (new SimpleStatement(std::shared_ptr<True> (new True()))); }
+simple_statement(X) ::= function_call(A) .                   { X = std::shared_ptr<SimpleStatement> (new SimpleStatement(A)); }
+
+
+function_definition_list(X) ::= function_definition(A). {
+  X = std::shared_ptr<FunctionDefinitionList> (new FunctionDefinitionList(A));
+}
+function_definition_list ::= function_definition_list(A) function_definition(B). {
+  A->append(B);
+}
+function_definition(X) ::= COL symbol(A) statement_list(B) SCO. {
+  X = std::shared_ptr<FunctionDefinition> (new FunctionDefinition(A,B));
+}
+
