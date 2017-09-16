@@ -117,14 +117,13 @@ public:
   virtual void visitor(StoreReturnOp *a);
   virtual void visitor(String *a);
   virtual void visitor(SwapOp *a);
+  virtual void visitor(Symbol *a);
   virtual void visitor(ToReturnOp *a);
   virtual void visitor(True *a);
   virtual void visitor(TuckOp *a);
   virtual void visitor(UnsignedDotOp *a);
   virtual void visitor(UntilLoopStatement *a);
   virtual void visitor(VariableDefinition *a);
-
-  enum X { SYNTAX_I, SYNTAX_J, SYNTAX_STRING, MEMORY, RUNTIME_FUNCTION_ERROR };
 
 private:
   Forth *forth;

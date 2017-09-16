@@ -58,6 +58,7 @@ std::string StoreBaseOp::name() {
 FetchOp::FetchOp(std::shared_ptr<N> a, std::shared_ptr<N> b)
     : BinaryOp("Fetch", a, b) {}
 FetchOp::FetchOp(std::shared_ptr<N> b) : BinaryOp("Fetch", b) {}
+FetchOp::FetchOp() : BinaryOp("Fetch") {}
 void FetchOp::accept(Visitor *a) { a->visitor(this); };
 
 std::string FetchOp::name() {

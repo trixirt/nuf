@@ -112,6 +112,7 @@ class Store2Op;
 class StoreCOp;
 class StoreReturnOp;
 class String;
+class Symbol;
 class SwapOp;
 class ToReturnOp;
 class True;
@@ -200,6 +201,7 @@ public:
   virtual void visitor(StoreReturnOp *a) = 0;
   virtual void visitor(String *a) = 0;
   virtual void visitor(SwapOp *a) = 0;
+  virtual void visitor(Symbol *a) = 0;
   virtual void visitor(ToReturnOp *a) = 0;
   virtual void visitor(True *a) = 0;
   virtual void visitor(TuckOp *a) = 0;

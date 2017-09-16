@@ -192,6 +192,7 @@ class FetchOp : public BinaryOp {
 public:
   FetchOp(std::shared_ptr<N> a, std::shared_ptr<N> b);
   FetchOp(std::shared_ptr<N> b);
+  FetchOp();
   virtual void accept(Visitor *a);
   std::string name();
 };
@@ -200,6 +201,7 @@ class FetchCOp : public BinaryOp {
 public:
   FetchCOp(std::shared_ptr<N> a, std::shared_ptr<N> b);
   FetchCOp(std::shared_ptr<N> b);
+  FetchCOp();
   virtual void accept(Visitor *a);
   std::string name();
 };

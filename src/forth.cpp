@@ -426,6 +426,14 @@ void Forth::store(llvm::GlobalVariable *a, llvm::Value *b) {
   in(st);
 }
 
+void Forth::store(llvm::Value *a, llvm::Value *b) {
+  llvm::CastInst *cst =
+      llvm::CastInst::Create(llvm::Instruction::IntToPtr, a, _t["i*"]);
+  llvm::StoreInst *st = new llvm::StoreInst(b, cst);
+  in(cst);
+  in(st);
+}
+
 void Forth::storeC(llvm::GlobalVariable *a, llvm::Value *b) {
   llvm::CastInst *cst =
       llvm::CastInst::Create(llvm::Instruction::ZExt, b, _t["i"]);
@@ -435,6 +443,15 @@ void Forth::storeC(llvm::GlobalVariable *a, llvm::Value *b) {
 
 llvm::LoadInst *Forth::fetch(llvm::GlobalVariable *a) {
   llvm::LoadInst *ret = new llvm::LoadInst(a);
+  in(ret);
+  return ret;
+}
+
+llvm::LoadInst *Forth::fetch(llvm::Value *a) {
+  llvm::CastInst *cst =
+      llvm::CastInst::Create(llvm::Instruction::IntToPtr, a, _t["i*"]);
+  llvm::LoadInst *ret = new llvm::LoadInst(cst);
+  in(cst);
   in(ret);
   return ret;
 }
@@ -547,10 +564,14 @@ bool Forth::emit(std::string output) {
 
   try {
     _program->accept(ev);
-  } catch (enum ForthEmitVisitor::X e) {
+  } catch (enum Forth::X e) {
     switch (e) {
-    case ForthEmitVisitor::X::RUNTIME_FUNCTION_ERROR:
-      std::cout << "Exception with specifying runtime function " << _error_info
+    case Forth::X::UNDEFINED_SYMBOL:
+      syntaxError("Undefined symbol", x_code);
+      break;
+
+    case Forth::X::RUNTIME_FUNCTION_ERROR:
+      std::cout << "Exception with specifying runtime function " << x_error_info
                 << std::endl;
       break;
       //      default:
@@ -655,13 +676,29 @@ std::vector<llvm::BasicBlock *> Forth::blocks(unsigned int n,
   return r;
 }
 
-void Forth::syntax_error() {
-  char *line = scanner->line();
-  char *loc = scanner->loc_string();
+void Forth::syntaxError(const char *a, Code *b) {
+  char *line = nullptr;
+  char *loc = nullptr;
+  if (a == nullptr)
+    a = "Syntax error";
+
+  if (b == nullptr) {
+    line = scanner->line();
+    loc = scanner->loc_string();
+    fprintf(stderr, "%s at %s\n%s\n", a, loc, line);
+  } else {
+    fprintf(stderr, "%s : %s at %lu:%lu\n", a, b->text(), b->lineno(),
+            b->position());
+    // TODO : need something like this ..
+    // line = scanner->line(b->lineno());
+    // fprintf(stderr, "%s\n", line);
+  }
+
+#if 0
   if ((line != NULL) && (loc != NULL))
-    fprintf(stderr, "syntax error at %s\n%s\n", loc, line);
+      fprintf(stderr, "%s at %s\n%s\n", a, loc, line);
   else
-    fprintf(stderr, "syntax error at %lu\n", scanner->lineno());
+      fprintf(stderr, "%s at %lu\n", a, scanner->lineno());
 
   if (scanner->position() < 400) {
     for (uint64_t l = 0; l < scanner->position(); l++)
@@ -671,6 +708,7 @@ void Forth::syntax_error() {
       fprintf(stderr, " ");
     fprintf(stderr, "|\n");
   }
+#endif
   if (line != NULL)
     free(line);
   exit(-1);
@@ -710,5 +748,27 @@ void Forth::moveTerminator(llvm::BasicBlock *a) {
     } else {
       printf("Ooops\n");
     }
+  }
+}
+
+void Forth::symbol(Symbol *a) {
+
+  std::string n = a->string();
+  if (global_variables.find(n) != global_variables.end()) {
+    auto i = global_variables.find(n);
+    llvm::GlobalVariable *v0 = i->second;
+    llvm::CastInst *cst =
+        llvm::CastInst::Create(llvm::Instruction::PtrToInt, v0, _t["i"]);
+    in(cst);
+    push(cst);
+
+  } else if (user_functions.find(n) != user_functions.end()) {
+    llvm::Function *f = user_functions[n];
+    llvm::CallInst *op =
+        llvm::CallInst::Create(_ft_void, f, llvm::ArrayRef<llvm::Value *>({}));
+    in(op);
+  } else {
+    x_code = a;
+    throw(UNDEFINED_SYMBOL);
   }
 }

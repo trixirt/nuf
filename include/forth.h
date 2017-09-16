@@ -58,8 +58,10 @@ public:
   int parse(int tokenID, std::shared_ptr<N> token) override;
   bool emit(std::string filename) override;
   llvm::LoadInst *fetch(llvm::GlobalVariable *a);
+  llvm::LoadInst *fetch(llvm::Value *a);
   llvm::CastInst *fetchC(llvm::GlobalVariable *a);
   void store(llvm::GlobalVariable *a, llvm::Value *b);
+  void store(llvm::Value *a, llvm::Value *b);
   void storeC(llvm::GlobalVariable *a, llvm::Value *b);
   llvm::CastInst *op_cast(llvm::Value *a);
   llvm::CallInst *op_call(std::string function_name);
@@ -87,7 +89,7 @@ public:
   llvm::SelectInst *op_select(llvm::Value *c, llvm::Value *t, llvm::Value *f);
   llvm::Type *getStackElementType() { return _t["i"]; }
 
-  void syntax_error();
+  void syntaxError(const char *a = nullptr, Code *b = nullptr);
 
   void leavePush(llvm::BasicBlock *bb);
   void leavePop();
@@ -130,6 +132,7 @@ private:
   llvm::CastInst *popC();
   llvm::LoadInst *pop(llvm::GlobalVariable *v, llvm::GlobalVariable *i,
                       llvm::Type *t);
+  void symbol(Symbol *a);
   void here();
   void push(llvm::Value *a);
   void pushC(llvm::Value *a);
@@ -169,7 +172,16 @@ private:
   /* Friends */
   friend class ForthEmitVisitor;
   /* For execptions */
-  std::string _error_info;
+  std::string x_error_info;
+  Code *x_code;
+  enum X {
+    SYNTAX_I,
+    SYNTAX_J,
+    SYNTAX_STRING,
+    MEMORY,
+    RUNTIME_FUNCTION_ERROR,
+    UNDEFINED_SYMBOL
+  };
 };
 
 #endif

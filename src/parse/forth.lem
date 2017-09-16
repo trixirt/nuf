@@ -50,7 +50,7 @@
 }
 
 %syntax_error {
-  forth->syntax_error();
+  forth->syntaxError();
   //    fprintf(stderr, "%p %d Syntax error\n", (void *)yypParser, yymajor);
 }
 
@@ -218,30 +218,27 @@ op(X) ::= GTUNSIGNED .                                       { X = std::shared_p
 op(X) ::= XOR .                                              { X = std::shared_ptr<ExclusiveOrOp> (new ExclusiveOrOp()); }
 
 
-op(X) ::= LITERAL(A) EXL .                                   { X = std::shared_ptr<StoreOp> (new StoreOp(A)); }
-op(X) ::= symbol(A) EXL .                                   { X = std::shared_ptr<StoreOp> (new StoreOp(A)); }
-op(X) ::= LITERAL(A) AT .                                    { X = std::shared_ptr<FetchOp> (new FetchOp(A)); }
-op(X) ::= symbol(A) AT .                                    { X = std::shared_ptr<FetchOp> (new FetchOp(A)); }
+op(X) ::= EXL .                                    { X = std::shared_ptr<StoreOp> (new StoreOp()); }
+op(X) ::= AT .                                     { X = std::shared_ptr<FetchOp> (new FetchOp()); }
 // 6.1.0850
 op(X) ::= LITERAL(A) STORE_C .                               { X = std::shared_ptr<StoreCOp> (new StoreCOp(A)); }
-op(X) ::= symbol(A) STORE_C .                               { X = std::shared_ptr<StoreCOp> (new StoreCOp(A)); }
+op(X) ::= symbol(A) STORE_C .                                { X = std::shared_ptr<StoreCOp> (new StoreCOp(A)); }
 // 6.1.0870
 op(X) ::= LITERAL(A) FETCH_C .                               { X = std::shared_ptr<FetchCOp> (new FetchCOp(A)); }
-op(X) ::= symbol(A) FETCH_C .                               { X = std::shared_ptr<FetchCOp> (new FetchCOp(A)); }
+op(X) ::= symbol(A) FETCH_C .                                { X = std::shared_ptr<FetchCOp> (new FetchCOp(A)); }
 
 // 6.1.0310
-op(X) ::= LITERAL(A) TWOSTORE .                                { X = std::shared_ptr<Store2Op> (new Store2Op(A)); }
-op(X) ::= symbol(A) TWOSTORE .                                { X = std::shared_ptr<Store2Op> (new Store2Op(A)); }
+op(X) ::= LITERAL(A) TWOSTORE .                              { X = std::shared_ptr<Store2Op> (new Store2Op(A)); }
+op(X) ::= symbol(A) TWOSTORE .                               { X = std::shared_ptr<Store2Op> (new Store2Op(A)); }
 
 
 // 6.2.1930
 op(X) ::= NIP .                                              { X = std::shared_ptr<NipOp> (new NipOp()); }
 // 6.2.2300
-op(X) ::= TUCK .                                              { X = std::shared_ptr<TuckOp> (new TuckOp()); }
+op(X) ::= TUCK .                                             { X = std::shared_ptr<TuckOp> (new TuckOp()); }
 
 variable_definition(X) ::= VARIABLE symbol(A) .              { X = std::shared_ptr<VariableDefinition> (new VariableDefinition(A));  }
 constant_definition(X) ::= number(A) CONSTANT symbol(B) .    { X = std::shared_ptr<ConstantDefinition> (new ConstantDefinition(B,A)); /* xxx */}
-function_call(X) ::= symbol(A) . { X = std::shared_ptr<FunctionCall> (new FunctionCall(A)); }
 
 symbol(X) ::= SYMBOL(A) .                                    { X = std::dynamic_pointer_cast<Symbol>(A); }
 number(X) ::= NUMBER(A) .                                    { X = std::dynamic_pointer_cast<Number>(A); }
@@ -255,7 +252,7 @@ simple_statement(X) ::= number(A) .                          { X = std::shared_p
 simple_statement(X) ::= string(A) .                          { X = std::shared_ptr<SimpleStatement> (new SimpleStatement(A)); }
 simple_statement(X) ::= FALSE .                              { X = std::shared_ptr<SimpleStatement> (new SimpleStatement(std::shared_ptr<False> (new False()))); }
 simple_statement(X) ::= TRUE .                               { X = std::shared_ptr<SimpleStatement> (new SimpleStatement(std::shared_ptr<True> (new True()))); }
-simple_statement(X) ::= function_call(A) .                   { X = std::shared_ptr<SimpleStatement> (new SimpleStatement(A)); }
+simple_statement(X) ::= symbol(A) .                   { X = std::shared_ptr<SimpleStatement> (new SimpleStatement(A)); }
 
 
 function_definition_list(X) ::= function_definition(A). {

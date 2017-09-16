@@ -108,7 +108,7 @@ void ForthEmitVisitor::visitor(IncLoopStatement *a) {
 
 void ForthEmitVisitor::visitor(IOp *a) {
   if (forth->_lvs.size() <= 0) {
-    throw SYNTAX_I;
+    throw Forth::SYNTAX_I;
   } else {
     llvm::Value *v = forth->_lvs[0];
     forth->push(v);
@@ -116,7 +116,7 @@ void ForthEmitVisitor::visitor(IOp *a) {
 }
 void ForthEmitVisitor::visitor(JOp *a) {
   if (forth->_lvs.size() <= 1) {
-    throw SYNTAX_J;
+    throw Forth::SYNTAX_J;
   } else {
     llvm::Value *v = forth->_lvs[1];
     forth->push(v);
@@ -169,6 +169,8 @@ void ForthEmitVisitor::visitor(IfElseStatement *a) {
 }
 
 void ForthEmitVisitor::visitor(BlOp *a) { forth->push(forth->_space); }
+
+void ForthEmitVisitor::visitor(Symbol *a) { forth->symbol(a); }
 
 void ForthEmitVisitor::visitor(FunctionCall *a) {
   forth->callLocalFunction(a->string());
@@ -329,8 +331,8 @@ void ForthEmitVisitor::visitor(KeyOp *a) {
   std::string f = "_nuf_runtime_get_c";
   r = forth->op_call(f);
   if (r == nullptr) {
-    forth->_error_info = f;
-    throw(RUNTIME_FUNCTION_ERROR);
+    forth->x_error_info = f;
+    throw(Forth::RUNTIME_FUNCTION_ERROR);
   }
   forth->push(r);
 }
@@ -342,8 +344,8 @@ void ForthEmitVisitor::visitor(EmitOp *a) {
 
   o = forth->op_call(f, v);
   if (o == nullptr) {
-    forth->_error_info = f;
-    throw(RUNTIME_FUNCTION_ERROR);
+    forth->x_error_info = f;
+    throw(Forth::RUNTIME_FUNCTION_ERROR);
   }
 }
 
@@ -353,8 +355,8 @@ void ForthEmitVisitor::visitor(DotOp *a) {
   std::string f = "_nuf_runtime_print_n";
   o = forth->op_call(f, v);
   if (o == nullptr) {
-    forth->_error_info = f;
-    throw(RUNTIME_FUNCTION_ERROR);
+    forth->x_error_info = f;
+    throw(Forth::RUNTIME_FUNCTION_ERROR);
   }
 }
 void ForthEmitVisitor::visitor(UnsignedDotOp *a) {
@@ -363,8 +365,8 @@ void ForthEmitVisitor::visitor(UnsignedDotOp *a) {
   std::string f = "_nuf_runtime_print_u";
   o = forth->op_call(f, v);
   if (o == nullptr) {
-    forth->_error_info = f;
-    throw(RUNTIME_FUNCTION_ERROR);
+    forth->x_error_info = f;
+    throw(Forth::RUNTIME_FUNCTION_ERROR);
   }
 }
 
@@ -373,8 +375,8 @@ void ForthEmitVisitor::visitor(CrOp *a) {
   std::string f = "_nuf_runtime_print_c_n";
   o = forth->op_call(f, forth->_cr, forth->_one);
   if (o == nullptr) {
-    forth->_error_info = f;
-    throw(RUNTIME_FUNCTION_ERROR);
+    forth->x_error_info = f;
+    throw(Forth::RUNTIME_FUNCTION_ERROR);
   }
 }
 
@@ -383,8 +385,8 @@ void ForthEmitVisitor::visitor(SpaceOp *a) {
   std::string f = "_nuf_runtime_print_c_n";
   o = forth->op_call(f, forth->_space, forth->_one);
   if (o == nullptr) {
-    forth->_error_info = f;
-    throw(RUNTIME_FUNCTION_ERROR);
+    forth->x_error_info = f;
+    throw(Forth::RUNTIME_FUNCTION_ERROR);
   }
 }
 
@@ -394,8 +396,8 @@ void ForthEmitVisitor::visitor(SpacesOp *a) {
   std::string f = "_nuf_runtime_print_c_n";
   o = forth->op_call(f, forth->_space, v);
   if (o == nullptr) {
-    forth->_error_info = f;
-    throw(RUNTIME_FUNCTION_ERROR);
+    forth->x_error_info = f;
+    throw(Forth::RUNTIME_FUNCTION_ERROR);
   }
 }
 
@@ -605,17 +607,9 @@ void ForthEmitVisitor::visitor(FromReturnOp *a) {
   forth->push(v0);
 }
 void ForthEmitVisitor::visitor(StoreOp *a) {
-  auto i = forth->global_variables.find(a->name());
-  if (i != forth->global_variables.end()) {
-    llvm::GlobalVariable *v0 = i->second;
-    llvm::Value *v1 = forth->pop();
-    forth->store(v0, v1);
-    // TODO
-    // Add use-by to variable
-  } else {
-    // TODO
-    // Handle the error case of not having defined the variable
-  }
+  llvm::Value *v0 = forth->pop();
+  llvm::Value *v1 = forth->pop();
+  forth->store(v0, v1);
 }
 
 void ForthEmitVisitor::visitor(StoreCOp *a) {
@@ -661,31 +655,23 @@ void ForthEmitVisitor::visitor(String *a) {
         sb += 2;
         o = forth->op_call(f, forth->string(sb));
         if (o == nullptr) {
-          forth->_error_info = f;
-          throw(RUNTIME_FUNCTION_ERROR);
+          forth->x_error_info = f;
+          throw(Forth::RUNTIME_FUNCTION_ERROR);
         }
       }
       free(b);
     } else {
       free(b);
-      throw SYNTAX_STRING;
+      throw Forth::SYNTAX_STRING;
     }
   } else {
-    throw MEMORY;
+    throw Forth::MEMORY;
   }
 }
 void ForthEmitVisitor::visitor(FetchOp *a) {
-  auto i = forth->global_variables.find(a->name());
-  if (i != forth->global_variables.end()) {
-    llvm::GlobalVariable *v0 = i->second;
-    llvm::Value *r = forth->fetch(v0);
-    forth->push(r);
-    // TODO
-    // Add use-by to variable
-  } else {
-    // TODO
-    // Handle the error case of not having defined the variable
-  }
+  llvm::Value *v0 = forth->pop();
+  llvm::Value *r = forth->fetch(v0);
+  forth->push(r);
 }
 
 void ForthEmitVisitor::visitor(FetchCOp *a) {
