@@ -102,6 +102,8 @@ public:
     virtual void accept(Visitor *a) { a->visitor(this); };                     \
   };
 
+UO(CellPlus)
+UO(Cells)
 UO(Dec)
 UO(Dot)
 UO(Drop)

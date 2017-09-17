@@ -49,6 +49,8 @@ public:
   virtual void visitor(CheckLoopStatement *a);
   virtual void visitor(Constant *a);
   virtual void visitor(CrOp *a);
+  virtual void visitor(CellPlusOp *a);
+  virtual void visitor(CellsOp *a);
   virtual void visitor(DecOp *a);
   virtual void visitor(DecimalOp *a);
   virtual void visitor(Delimiter *a);

@@ -152,6 +152,14 @@ op(X) ::= ALIGN .                                            { X = std::shared_p
 op(X) ::= BASE .                                             { X = std::shared_ptr<BaseOp> (new BaseOp()); }
 // 6.1.0770
 op(X) ::= BL .                                               { X = std::shared_ptr<BlOp> (new BlOp()); }
+// 6.1.0850
+op(X) ::= STORE_C .                                          { X = std::shared_ptr<StoreCOp> (new StoreCOp()); }
+// 6.1.0870
+op(X) ::= FETCH_C .                                          { X = std::shared_ptr<FetchCOp> (new FetchCOp()); }
+// 6.1.0880
+op(X) ::= CELL_PLUS .                                        { X = std::shared_ptr<CellPlusOp> (new CellPlusOp()); }
+// 6.1.0890
+op(X) ::= CELLS .                                            { X = std::shared_ptr<CellsOp> (new CellsOp()); }
 // 6.1.0990
 op(X) ::= CR .                                               { X = std::shared_ptr<CrOp> (new CrOp()); }
 // 6.1.1170
@@ -220,10 +228,6 @@ op(X) ::= XOR .                                              { X = std::shared_p
 
 op(X) ::= EXL .                                    { X = std::shared_ptr<StoreOp> (new StoreOp()); }
 op(X) ::= AT .                                     { X = std::shared_ptr<FetchOp> (new FetchOp()); }
-// 6.1.0850
-op(X) ::= STORE_C .                               { X = std::shared_ptr<StoreCOp> (new StoreCOp()); }
-// 6.1.0870
-op(X) ::= FETCH_C .                               { X = std::shared_ptr<FetchCOp> (new FetchCOp()); }
 
 // 6.1.0310
 op(X) ::= LITERAL(A) TWOSTORE .                              { X = std::shared_ptr<Store2Op> (new Store2Op(A)); }

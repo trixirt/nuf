@@ -56,6 +56,7 @@ Forth::Forth(std::shared_ptr<CPU> cpu, std::string filename)
   _ft_void = llvm::FunctionType::get(_t["v"], false);
 
   /* Some useful constants */
+  _cell = constant(pointer_size() / 8);
   _zero = constant(0);
   _one = constant(1);
   _minus_one = constant(-1);
@@ -425,6 +426,7 @@ void Forth::store(llvm::Value *a, llvm::Value *b) {
   llvm::CastInst *cst =
       llvm::CastInst::Create(llvm::Instruction::IntToPtr, a, _t["i*"]);
   llvm::StoreInst *st = new llvm::StoreInst(b, cst);
+
   in(cst);
   in(st);
 }
@@ -433,13 +435,10 @@ void Forth::storeC(llvm::Value *a, llvm::Value *b) {
 
   llvm::CastInst *cst0 =
       llvm::CastInst::Create(llvm::Instruction::IntToPtr, a, _t["i*"]);
-
   llvm::CastInst *cst1 =
       llvm::CastInst::Create(llvm::Instruction::Trunc, b, _t["c"]);
-
   llvm::CastInst *cst2 =
       llvm::CastInst::Create(llvm::Instruction::ZExt, cst1, _t["i"]);
-
   llvm::StoreInst *st = new llvm::StoreInst(cst2, cst0);
 
   in(cst0);
@@ -452,6 +451,7 @@ llvm::LoadInst *Forth::fetch(llvm::Value *a) {
   llvm::CastInst *cst =
       llvm::CastInst::Create(llvm::Instruction::IntToPtr, a, _t["i*"]);
   llvm::LoadInst *ret = new llvm::LoadInst(cst);
+
   in(cst);
   in(ret);
   return ret;
@@ -461,11 +461,9 @@ llvm::CastInst *Forth::fetchC(llvm::Value *a) {
 
   llvm::CastInst *cst0 =
       llvm::CastInst::Create(llvm::Instruction::IntToPtr, a, _t["i*"]);
-
   llvm::LoadInst *ld = new llvm::LoadInst(cst0);
   llvm::CastInst *cst1 =
       llvm::CastInst::Create(llvm::Instruction::Trunc, ld, _t["c"]);
-  cst1->setName("fetchC");
 
   in(cst0);
   in(ld);

@@ -163,6 +163,7 @@ private:
   llvm::Constant *_ffff;        /* -1 */
   llvm::Constant *_space;       /* ' ' */
   llvm::Constant *_cr;          /* '\n' */
+  llvm::Constant *_cell;        /* size of a cell */
   llvm::Function *_nuf;         /* main function */
   llvm::FunctionType *_ft_void; /* every functions type */
 

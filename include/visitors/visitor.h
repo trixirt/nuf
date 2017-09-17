@@ -47,6 +47,8 @@ class Constant;
 class EqualsZeroOp;
 class Error;
 class ExclusiveOrOp;
+class CellPlusOp;
+class CellsOp;
 class DecOp;
 class DecimalOp;
 class Delimiter;
@@ -134,6 +136,8 @@ public:
   virtual void visitor(Constant *a) = 0;
   virtual void visitor(CrOp *a) = 0;
   virtual void visitor(ExclusiveOrOp *a) = 0;
+  virtual void visitor(CellPlusOp *a) = 0;
+  virtual void visitor(CellsOp *a) = 0;
   virtual void visitor(DecOp *a) = 0;
   virtual void visitor(DecimalOp *a) = 0;
   virtual void visitor(Delimiter *a) = 0;

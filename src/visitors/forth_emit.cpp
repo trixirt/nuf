@@ -299,9 +299,22 @@ void ForthEmitVisitor::visitor(DepthOp *a) {
 }
 
 void ForthEmitVisitor::visitor(SToDOp *a) {
-  printf("im\n");
   llvm::Value *v = forth->pop();
   llvm::Value *r = forth->op_cast(v);
+  forth->push(r);
+}
+
+void ForthEmitVisitor::visitor(CellPlusOp *a) {
+  llvm::Value *v1 = forth->_cell;
+  llvm::Value *v0 = forth->pop();
+  llvm::Value *r = forth->op_plus(v0, v1);
+  forth->push(r);
+}
+
+void ForthEmitVisitor::visitor(CellsOp *a) {
+  llvm::Value *v1 = forth->_cell;
+  llvm::Value *v0 = forth->pop();
+  llvm::Value *r = forth->op_multiply(v0, v1);
   forth->push(r);
 }
 
@@ -478,7 +491,6 @@ void ForthEmitVisitor::visitor(LessThanZeroOp *a) {
   llvm::Value *v0 = forth->pop();
   llvm::Value *cmp = forth->op_less_than_signed(v0, forth->_zero);
   llvm::Value *r = forth->op_select(cmp, forth->_ffff, forth->_zero);
-  r->setName("less-than-zero");
   forth->push(r);
 }
 
