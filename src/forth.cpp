@@ -421,11 +421,6 @@ void Forth::set(llvm::Value *a, llvm::GlobalVariable *v,
   in(st);
 }
 
-void Forth::store(llvm::GlobalVariable *a, llvm::Value *b) {
-  llvm::StoreInst *st = new llvm::StoreInst(b, a);
-  in(st);
-}
-
 void Forth::store(llvm::Value *a, llvm::Value *b) {
   llvm::CastInst *cst =
       llvm::CastInst::Create(llvm::Instruction::IntToPtr, a, _t["i*"]);
@@ -434,17 +429,23 @@ void Forth::store(llvm::Value *a, llvm::Value *b) {
   in(st);
 }
 
-void Forth::storeC(llvm::GlobalVariable *a, llvm::Value *b) {
-  llvm::CastInst *cst =
-      llvm::CastInst::Create(llvm::Instruction::ZExt, b, _t["i"]);
-  in(cst);
-  store(a, cst);
-}
+void Forth::storeC(llvm::Value *a, llvm::Value *b) {
 
-llvm::LoadInst *Forth::fetch(llvm::GlobalVariable *a) {
-  llvm::LoadInst *ret = new llvm::LoadInst(a);
-  in(ret);
-  return ret;
+  llvm::CastInst *cst0 =
+      llvm::CastInst::Create(llvm::Instruction::IntToPtr, a, _t["i*"]);
+
+  llvm::CastInst *cst1 =
+      llvm::CastInst::Create(llvm::Instruction::Trunc, b, _t["c"]);
+
+  llvm::CastInst *cst2 =
+      llvm::CastInst::Create(llvm::Instruction::ZExt, cst1, _t["i"]);
+
+  llvm::StoreInst *st = new llvm::StoreInst(cst2, cst0);
+
+  in(cst0);
+  in(cst1);
+  in(cst2);
+  in(st);
 }
 
 llvm::LoadInst *Forth::fetch(llvm::Value *a) {
@@ -456,13 +457,20 @@ llvm::LoadInst *Forth::fetch(llvm::Value *a) {
   return ret;
 }
 
-llvm::CastInst *Forth::fetchC(llvm::GlobalVariable *a) {
-  llvm::LoadInst *ld = new llvm::LoadInst(a);
-  llvm::CastInst *cst =
+llvm::CastInst *Forth::fetchC(llvm::Value *a) {
+
+  llvm::CastInst *cst0 =
+      llvm::CastInst::Create(llvm::Instruction::IntToPtr, a, _t["i*"]);
+
+  llvm::LoadInst *ld = new llvm::LoadInst(cst0);
+  llvm::CastInst *cst1 =
       llvm::CastInst::Create(llvm::Instruction::Trunc, ld, _t["c"]);
+  cst1->setName("fetchC");
+
+  in(cst0);
   in(ld);
-  in(cst);
-  return cst;
+  in(cst1);
+  return cst1;
 }
 
 void Forth::push(llvm::Value *a) { push(a, _st, _idx); }

@@ -221,11 +221,9 @@ op(X) ::= XOR .                                              { X = std::shared_p
 op(X) ::= EXL .                                    { X = std::shared_ptr<StoreOp> (new StoreOp()); }
 op(X) ::= AT .                                     { X = std::shared_ptr<FetchOp> (new FetchOp()); }
 // 6.1.0850
-op(X) ::= LITERAL(A) STORE_C .                               { X = std::shared_ptr<StoreCOp> (new StoreCOp(A)); }
-op(X) ::= symbol(A) STORE_C .                                { X = std::shared_ptr<StoreCOp> (new StoreCOp(A)); }
+op(X) ::= STORE_C .                               { X = std::shared_ptr<StoreCOp> (new StoreCOp()); }
 // 6.1.0870
-op(X) ::= LITERAL(A) FETCH_C .                               { X = std::shared_ptr<FetchCOp> (new FetchCOp(A)); }
-op(X) ::= symbol(A) FETCH_C .                                { X = std::shared_ptr<FetchCOp> (new FetchCOp(A)); }
+op(X) ::= FETCH_C .                               { X = std::shared_ptr<FetchCOp> (new FetchCOp()); }
 
 // 6.1.0310
 op(X) ::= LITERAL(A) TWOSTORE .                              { X = std::shared_ptr<Store2Op> (new Store2Op(A)); }

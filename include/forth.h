@@ -57,12 +57,10 @@ public:
   std::shared_ptr<N> scan(int *tokenid) override;
   int parse(int tokenID, std::shared_ptr<N> token) override;
   bool emit(std::string filename) override;
-  llvm::LoadInst *fetch(llvm::GlobalVariable *a);
   llvm::LoadInst *fetch(llvm::Value *a);
-  llvm::CastInst *fetchC(llvm::GlobalVariable *a);
-  void store(llvm::GlobalVariable *a, llvm::Value *b);
+  llvm::CastInst *fetchC(llvm::Value *a);
   void store(llvm::Value *a, llvm::Value *b);
-  void storeC(llvm::GlobalVariable *a, llvm::Value *b);
+  void storeC(llvm::Value *a, llvm::Value *b);
   llvm::CastInst *op_cast(llvm::Value *a);
   llvm::CallInst *op_call(std::string function_name);
   llvm::CallInst *op_call(std::string function_name, llvm::Value *a);

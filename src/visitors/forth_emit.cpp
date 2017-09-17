@@ -613,17 +613,9 @@ void ForthEmitVisitor::visitor(StoreOp *a) {
 }
 
 void ForthEmitVisitor::visitor(StoreCOp *a) {
-  auto i = forth->global_variables.find(a->name());
-  if (i != forth->global_variables.end()) {
-    llvm::GlobalVariable *v0 = i->second;
-    llvm::Value *v1 = forth->popC();
-    forth->storeC(v0, v1);
-    // TODO
-    // Add use-by to variable
-  } else {
-    // TODO
-    // Handle the error case of not having defined the variable
-  }
+  llvm::Value *v0 = forth->pop();
+  llvm::Value *v1 = forth->pop();
+  forth->storeC(v0, v1);
 }
 
 void ForthEmitVisitor::visitor(Store2Op *a) {
@@ -675,17 +667,9 @@ void ForthEmitVisitor::visitor(FetchOp *a) {
 }
 
 void ForthEmitVisitor::visitor(FetchCOp *a) {
-  auto i = forth->global_variables.find(a->name());
-  if (i != forth->global_variables.end()) {
-    llvm::GlobalVariable *v0 = i->second;
-    llvm::Value *r = forth->fetchC(v0);
-    forth->pushC(r);
-    // TODO
-    // Add use-by to variable
-  } else {
-    // TODO
-    // Handle the error case of not having defined the variable
-  }
+  llvm::Value *v0 = forth->pop();
+  llvm::Value *r = forth->fetchC(v0);
+  forth->push(r);
 }
 void ForthEmitVisitor::visitor(Constant *a) {
   auto i = forth->global_variables.find(a->name());
