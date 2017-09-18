@@ -56,7 +56,7 @@ ws  = [ \r\t\f];
 nl  = [\n];
 alpha = [a-zA-Z];
 alphanum = [a-zA-Z0-9];
-alphanumspec = [!@a-zA-Z0-9];
+alphanumspec = [!/*@a-zA-Z0-9];
 /* f12 3.4.1.3 Text interpretor input number conversion */
 binary_digit = [0-1];
 binary_number = "%"[-]?(binary_digit)(binary_digit)*;
