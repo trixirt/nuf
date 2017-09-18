@@ -630,20 +630,6 @@ void ForthEmitVisitor::visitor(StoreCOp *a) {
   forth->storeC(v0, v1);
 }
 
-void ForthEmitVisitor::visitor(Store2Op *a) {
-  auto i = forth->global_variables.find(a->name());
-  if (i != forth->global_variables.end()) {
-    llvm::GlobalVariable *v0 = i->second;
-    llvm::Value *v1 = forth->pop2();
-    forth->store(v0, v1);
-    // TODO
-    // Add use-by to variable
-  } else {
-    // TODO
-    // Handle the error case of not having defined the variable
-  }
-}
-
 void ForthEmitVisitor::visitor(String *a) {
   char *b = strdup(a->string().c_str());
   if (b) {
@@ -705,12 +691,17 @@ void ForthEmitVisitor::visitor(VariableDefinition *a) {
   if (i == forth->global_variables.end()) {
     // TODO
     // HANDLE NON-INTRINSIC
-    llvm::Type *t = forth->_t["i"];
+    size_t els = 0;
+    if (a->size())
+      els = (a->size() + forth->pointer_size() - 1) / forth->pointer_size();
+    llvm::ArrayType *at = llvm::ArrayType::get(forth->_t["i"], els);
+    llvm::ArrayRef<llvm::Constant *> aref;
+    llvm::Constant *ai = llvm::ConstantArray::get(at, aref);
     llvm::GlobalVariable *v;
     v = new llvm::GlobalVariable(
-        *(forth->_mod), t, false,
-        llvm::GlobalValue::LinkageTypes::PrivateLinkage,
-        llvm::Constant::getNullValue(t), a->getString(), nullptr);
+        *(forth->_mod), at, false,
+        llvm::GlobalValue::LinkageTypes::PrivateLinkage, ai, a->getString(),
+        nullptr);
     forth->global_variables[a->getString()] = v;
   } else {
     // TODO

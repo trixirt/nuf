@@ -56,6 +56,7 @@ ws  = [ \r\t\f];
 nl  = [\n];
 alpha = [a-zA-Z];
 alphanum = [a-zA-Z0-9];
+alphanumspec = [!@a-zA-Z0-9];
 /* f12 3.4.1.3 Text interpretor input number conversion */
 binary_digit = [0-1];
 binary_number = "%"[-]?(binary_digit)(binary_digit)*;
@@ -73,7 +74,7 @@ cnum = "'" printable_char "'";
 // To this :
 // number = (decimal_number) | (hexidecimal_number) | (binary_number);
 number = (decimal_number);
-symbol = (alpha)(alphanum)*;
+symbol = (alphanumspec)(alphanumspec)*;
 literal = (symbol) | (number);
 
 positive_decimal = [+]?[1-9][0-9]*;
@@ -87,6 +88,8 @@ word = alpha alphanum*;
    ABS
  */
 
+//    '2!'           { *tokenid = FORTH_TWOSTORE;              return empty();   }
+
 /*!re2c
     '('            { goto comment;                          }
     '\\'           { goto comment_line;                     }
@@ -97,7 +100,7 @@ word = alpha alphanum*;
     '0='           { *tokenid = FORTH_EQZERO;                return empty();   }
     '1+'           { *tokenid = FORTH_INC;                   return empty();   }
     '1-'           { *tokenid = FORTH_DEC;                   return empty();   }
-    '2!'           { *tokenid = FORTH_TWOSTORE;              return empty();   }
+    '2VARIABLE'    { *tokenid = FORTH_VARIABLE_TWO;          return empty();   }
     '<'            { *tokenid = FORTH_LTSIGNED;              return empty();   }
     '>'            { *tokenid = FORTH_GTSIGNED;              return empty();   }	
     '+'            { *tokenid = FORTH_PLUS;                  return empty();   }

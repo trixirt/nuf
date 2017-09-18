@@ -115,7 +115,6 @@ public:
   virtual void visitor(SToDOp *a);
   virtual void visitor(StoreOp *a);
   virtual void visitor(StoreCOp *a);
-  virtual void visitor(Store2Op *a);
   virtual void visitor(StoreReturnOp *a);
   virtual void visitor(String *a);
   virtual void visitor(SwapOp *a);

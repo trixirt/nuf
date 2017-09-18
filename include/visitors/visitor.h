@@ -110,7 +110,6 @@ class SpacesOp;
 class StatementList;
 class SToDOp;
 class StoreOp;
-class Store2Op;
 class StoreCOp;
 class StoreReturnOp;
 class String;
@@ -201,7 +200,6 @@ public:
   virtual void visitor(SToDOp *a) = 0;
   virtual void visitor(StoreOp *a) = 0;
   virtual void visitor(StoreCOp *a) = 0;
-  virtual void visitor(Store2Op *a) = 0;
   virtual void visitor(StoreReturnOp *a) = 0;
   virtual void visitor(String *a) = 0;
   virtual void visitor(SwapOp *a) = 0;

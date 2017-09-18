@@ -56,11 +56,12 @@ protected:
 
 class VariableDefinition : public SymbolDefinition {
 public:
-  VariableDefinition(std::shared_ptr<Symbol> a);
+  VariableDefinition(std::shared_ptr<Symbol> a, size_t size);
   virtual void accept(Visitor *a);
+  size_t size();
 
 protected:
-  // xxx std::shared_ptr<Variable> var;
+  size_t _size;
 };
 
 class Constant : public Variable {

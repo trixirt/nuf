@@ -35,7 +35,9 @@
 #ifndef _NUF_DICTIONARY_H
 #define _NUF_DICTIONARY_H
 
-static const char *forth_dictionary = \
-    ": ABS DUP 0< IF NEGATE THEN ; \n";
+static const char *forth_dictionary =   \
+    ": 2! SWAP OVER ! CELL+ ! ;       \n\
+     : 2@ DUP CELL+ @ SWAP @ ;        \n\
+     : ABS DUP 0< IF NEGATE THEN ;    \n";
 
 #endif /* _NUF_DICTIONARY_H */

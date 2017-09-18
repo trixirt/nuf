@@ -48,9 +48,10 @@ void Variable::accept(Visitor *a) { a->visitor(this); };
 std::string Variable::name() { return _name; };
 std::string Variable::type_name() { return _type_name; };
 
-VariableDefinition::VariableDefinition(std::shared_ptr<Symbol> a)
-    : SymbolDefinition(a) {}
+VariableDefinition::VariableDefinition(std::shared_ptr<Symbol> a, size_t size)
+    : SymbolDefinition(a), _size(size) {}
 void VariableDefinition::accept(Visitor *a) { a->visitor(this); };
+size_t VariableDefinition::size() { return _size; };
 
 Constant::Constant(std::shared_ptr<N> symbol_name, std::string type_name,
                    std::shared_ptr<N> initializer)

@@ -1,0 +1,1 @@
+: DICT_2! SWAP OVER ! CELL+ ! ;

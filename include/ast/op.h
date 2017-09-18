@@ -184,7 +184,6 @@ public:
   };
 
 SO(Store)
-SO(Store2)
 SO(StoreC)
 
 // TODO

@@ -138,6 +138,10 @@ op(X) ::= EQZERO .                                           { X = std::shared_p
 op(X) ::= INC .                                              { X = std::shared_ptr<IncOp> (new IncOp()); }
 // 6.1.0300
 op(X) ::= DEC .                                              { X = std::shared_ptr<DecOp> (new DecOp()); }
+// 6.1.0310
+//   2! is in the dicttionary
+// 6.1.0350
+//   2@ is in the dicttionary
 // 6.1.0480
 op(X) ::= LTSIGNED .                                         { X = std::shared_ptr<LessThanSignedOp> (new LessThanSignedOp()); }
 // 6.1.0540
@@ -229,9 +233,7 @@ op(X) ::= XOR .                                              { X = std::shared_p
 op(X) ::= EXL .                                    { X = std::shared_ptr<StoreOp> (new StoreOp()); }
 op(X) ::= AT .                                     { X = std::shared_ptr<FetchOp> (new FetchOp()); }
 
-// 6.1.0310
-op(X) ::= LITERAL(A) TWOSTORE .                              { X = std::shared_ptr<Store2Op> (new Store2Op(A)); }
-op(X) ::= symbol(A) TWOSTORE .                               { X = std::shared_ptr<Store2Op> (new Store2Op(A)); }
+
 
 
 // 6.2.1930
@@ -239,7 +241,8 @@ op(X) ::= NIP .                                              { X = std::shared_p
 // 6.2.2300
 op(X) ::= TUCK .                                             { X = std::shared_ptr<TuckOp> (new TuckOp()); }
 
-variable_definition(X) ::= VARIABLE symbol(A) .              { X = std::shared_ptr<VariableDefinition> (new VariableDefinition(A));  }
+variable_definition(X) ::= VARIABLE symbol(A) .              { X = std::shared_ptr<VariableDefinition> (new VariableDefinition(A, forth->pointer_size()));  }
+variable_definition(X) ::= VARIABLE_TWO symbol(A) .          { X = std::shared_ptr<VariableDefinition> (new VariableDefinition(A, 2 * forth->pointer_size()));  }
 constant_definition(X) ::= number(A) CONSTANT symbol(B) .    { X = std::shared_ptr<ConstantDefinition> (new ConstantDefinition(B,A)); /* xxx */}
 
 symbol(X) ::= SYMBOL(A) .                                    { X = std::dynamic_pointer_cast<Symbol>(A); }
