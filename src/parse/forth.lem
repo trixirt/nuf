@@ -164,6 +164,10 @@ op(X) ::= FETCH_C .                                          { X = std::shared_p
 op(X) ::= CELL_PLUS .                                        { X = std::shared_ptr<CellPlusOp> (new CellPlusOp()); }
 // 6.1.0890
 op(X) ::= CELLS .                                            { X = std::shared_ptr<CellsOp> (new CellsOp()); }
+// 6.1.0897
+//  CHAR+ is mapped to CELL+ in lexer
+// 6.1.0898
+//  CHARS is mapper to CELLS in lexer
 // 6.1.0990
 op(X) ::= CR .                                               { X = std::shared_ptr<CrOp> (new CrOp()); }
 // 6.1.1170
