@@ -146,6 +146,12 @@ op(X) ::= DEC .                                              { X = std::shared_p
 //   2/ is in the dicttionary
 // 6.1.0350
 //   2@ is in the dicttionary
+// 6.1.0380
+op(X) ::= DUP_TWO .                                         { X = std::shared_ptr<Dup2Op> (new Dup2Op()); }
+// 6.1.0400
+op(X) ::= OVER_TWO .                                         { X = std::shared_ptr<Over2Op> (new Over2Op()); }
+// 6.1.0430
+op(X) ::= SWAP_TWO .                                         { X = std::shared_ptr<Swap2Op> (new Swap2Op()); }
 // 6.1.0480
 op(X) ::= LTSIGNED .                                         { X = std::shared_ptr<LessThanSignedOp> (new LessThanSignedOp()); }
 // 6.1.0540

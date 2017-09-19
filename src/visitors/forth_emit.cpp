@@ -418,10 +418,20 @@ void ForthEmitVisitor::visitor(DropOp *a) { forth->pop(); }
 
 void ForthEmitVisitor::visitor(DupOp *a) {
   llvm::Value *v = forth->pop();
-  v->setName("dup");
   forth->push(v);
   forth->push(v);
 }
+
+void ForthEmitVisitor::visitor(Dup2Op *a) {
+  llvm::Value *va = forth->pop();
+  llvm::Value *vb = forth->pop();
+
+  forth->push(vb);
+  forth->push(va);
+  forth->push(vb);
+  forth->push(va);
+}
+
 void ForthEmitVisitor::visitor(EqualsZeroOp *a) {
   llvm::Value *v = forth->pop();
   llvm::Value *cmp = forth->op_equals(v, forth->_zero);
@@ -564,6 +574,20 @@ void ForthEmitVisitor::visitor(OverOp *a) {
   forth->push(v1);
   forth->push(v0);
 }
+
+void ForthEmitVisitor::visitor(Over2Op *a) {
+  llvm::Value *v1a = forth->pop();
+  llvm::Value *v1b = forth->pop();
+  llvm::Value *v0a = forth->pop();
+  llvm::Value *v0b = forth->pop();
+  forth->push(v0b);
+  forth->push(v0a);
+  forth->push(v1b);
+  forth->push(v1a);
+  forth->push(v0b);
+  forth->push(v0a);
+}
+
 void ForthEmitVisitor::visitor(PlusOp *a) {
   llvm::Value *v1 = forth->pop();
   llvm::Value *v0 = forth->pop();
@@ -589,6 +613,17 @@ void ForthEmitVisitor::visitor(SwapOp *a) {
   llvm::Value *v0 = forth->pop();
   forth->push(v1);
   forth->push(v0);
+}
+
+void ForthEmitVisitor::visitor(Swap2Op *a) {
+  llvm::Value *v1a = forth->pop();
+  llvm::Value *v1b = forth->pop();
+  llvm::Value *v0a = forth->pop();
+  llvm::Value *v0b = forth->pop();
+  forth->push(v1b);
+  forth->push(v1a);
+  forth->push(v0b);
+  forth->push(v0a);
 }
 
 void ForthEmitVisitor::visitor(NipOp *a) {

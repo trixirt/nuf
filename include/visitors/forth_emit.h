@@ -60,6 +60,7 @@ public:
   virtual void visitor(DotOp *a);
   virtual void visitor(DropOp *a);
   virtual void visitor(DupOp *a);
+  virtual void visitor(Dup2Op *a);
   virtual void visitor(EmitOp *a);
   virtual void visitor(EqualsZeroOp *a);
   virtual void visitor(ExclusiveOrOp *a);
@@ -103,6 +104,7 @@ public:
   virtual void visitor(Op *a);
   virtual void visitor(OrOp *a);
   virtual void visitor(OverOp *a);
+  virtual void visitor(Over2Op *a);
   virtual void visitor(PlusOp *a);
   virtual void visitor(Program *a);
   virtual void visitor(PushOp *a);
@@ -118,6 +120,7 @@ public:
   virtual void visitor(StoreReturnOp *a);
   virtual void visitor(String *a);
   virtual void visitor(SwapOp *a);
+  virtual void visitor(Swap2Op *a);
   virtual void visitor(Symbol *a);
   virtual void visitor(ToReturnOp *a);
   virtual void visitor(True *a);

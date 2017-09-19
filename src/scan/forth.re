@@ -100,6 +100,9 @@ word = alpha alphanum*;
     '0='           { *tokenid = FORTH_EQZERO;                return empty();   }
     '1+'           { *tokenid = FORTH_INC;                   return empty();   }
     '1-'           { *tokenid = FORTH_DEC;                   return empty();   }
+    '2DUP'         { *tokenid = FORTH_DUP_TWO;               return empty();   }
+    '2OVER'        { *tokenid = FORTH_OVER_TWO;              return empty();   }
+    '2SWAP'        { *tokenid = FORTH_SWAP_TWO;              return empty();   }
     '2VARIABLE'    { *tokenid = FORTH_VARIABLE_TWO;          return empty();   }
     '<'            { *tokenid = FORTH_LTSIGNED;              return empty();   }
     '>'            { *tokenid = FORTH_GTSIGNED;              return empty();   }	
