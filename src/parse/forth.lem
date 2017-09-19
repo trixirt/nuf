@@ -158,8 +158,10 @@ op(X) ::= LTSIGNED .                                         { X = std::shared_p
 op(X) ::= GTSIGNED .                                         { X = std::shared_ptr<GreaterThanSignedOp> (new GreaterThanSignedOp()); }
 // 6.1.0580
 op(X) ::= TOR .                                              { X = std::shared_ptr<ToReturnOp> (new ToReturnOp()); }
+// 6.1.0630
+//   ?DUP is in the compiler's dictionary
 // 6.1.0690
-// ABS is in the compiler's dictionary
+//   ABS is in the compiler's dictionary
 // 6.1.0705
 op(X) ::= ALIGN .                                            { X = std::shared_ptr<AlignOp> (new AlignOp()); }
 // 6.1.0750

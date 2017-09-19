@@ -36,11 +36,12 @@
 #define _NUF_DICTIONARY_H
 
 static const char *forth_dictionary =   \
-    ": 2! SWAP OVER ! CELL+ ! ;       \n\
-     : 2* 2 * ;                       \n\
-     : 2/ 2 / ;                       \n\
-     : 2@ DUP CELL+ @ SWAP @ ;        \n\
-     : 2DROP DROP DROP ;              \n\
-     : ABS DUP 0< IF NEGATE THEN ;    \n";
+    ": ?DUP DUP 0= INVERT IF DUP THEN ; \n\
+     : 2! SWAP OVER ! CELL+ ! ;         \n\
+     : 2* 2 * ;                         \n\
+     : 2/ 2 / ;                         \n\
+     : 2@ DUP CELL+ @ SWAP @ ;          \n\
+     : 2DROP DROP DROP ;                \n\
+     : ABS DUP 0< IF NEGATE THEN ;      \n";
 
 #endif /* _NUF_DICTIONARY_H */
