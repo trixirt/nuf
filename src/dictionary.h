@@ -41,6 +41,9 @@ static const char *forth_dictionary =   \
      : 2* 2 * ;                         \n\
      : 2/ 2 / ;                         \n\
      : 2@ DUP CELL+ @ SWAP @ ;          \n\
+     : 2>R SWAP >R >R ;                 \n\
+     : 2R> >R >R SWAP ;                 \n\
+     : 2R@ R> R> 2DUP >R >R SWAP ;      \n\
      : 2DROP DROP DROP ;                \n\
      : ABS DUP 0< IF NEGATE THEN ;      \n";
 

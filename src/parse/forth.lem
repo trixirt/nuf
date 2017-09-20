@@ -113,7 +113,8 @@ inc_loop_statement(X) ::= DO statement_list(A) NUMBER(B) LOOP_PLUS.             
 if_statement(X) ::= IF statement_list(A) THEN.                                      {  X = std::shared_ptr<IfStatement> (new IfStatement(A));  }
 if_else_statement(X) ::= IF statement_list(A) ELSE statement_list(B) THEN.          {  X = std::shared_ptr<IfElseStatement> (new IfElseStatement(A,B));  }
 
-
+// 6.1.0010
+op(X) ::= EXL .                                    { X = std::shared_ptr<StoreOp> (new StoreOp()); }
 // 6.1.0090
 op(X) ::= MUL .                                              { X = std::shared_ptr<MultiplyOp> (new MultiplyOp()); }
 // 6.1.0100
@@ -159,9 +160,11 @@ op(X) ::= GTSIGNED .                                         { X = std::shared_p
 // 6.1.0580
 op(X) ::= TOR .                                              { X = std::shared_ptr<ToReturnOp> (new ToReturnOp()); }
 // 6.1.0630
-//   ?DUP is in the compiler's dictionary
+//   ?DUP is in the dictionary
+// 6.1.0650
+op(X) ::= AT .                                               { X = std::shared_ptr<FetchOp> (new FetchOp()); }
 // 6.1.0690
-//   ABS is in the compiler's dictionary
+//   ABS is in the dictionary
 // 6.1.0705
 op(X) ::= ALIGN .                                            { X = std::shared_ptr<AlignOp> (new AlignOp()); }
 // 6.1.0750
@@ -246,11 +249,15 @@ op(X) ::= GTUNSIGNED .                                       { X = std::shared_p
 op(X) ::= XOR .                                              { X = std::shared_ptr<ExclusiveOrOp> (new ExclusiveOrOp()); }
 
 
-op(X) ::= EXL .                                    { X = std::shared_ptr<StoreOp> (new StoreOp()); }
-op(X) ::= AT .                                     { X = std::shared_ptr<FetchOp> (new FetchOp()); }
 
 
 
+// 6.2.0340
+//   2>R is in the compiler dictionary
+// 6.2.0410
+//   2R> is in the compiler dictionary
+// 6.2.0415
+//   2R@ is in the compiler dictionary
 
 // 6.2.1930
 op(X) ::= NIP .                                              { X = std::shared_ptr<NipOp> (new NipOp()); }
