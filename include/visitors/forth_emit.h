@@ -108,6 +108,7 @@ public:
   virtual void visitor(PlusOp *a);
   virtual void visitor(Program *a);
   virtual void visitor(PushOp *a);
+  virtual void visitor(QuitOp *a);
   virtual void visitor(RightShiftOp *a);
   virtual void visitor(RotateOp *a);
   virtual void visitor(SimpleStatement *a);

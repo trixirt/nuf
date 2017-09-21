@@ -223,6 +223,8 @@ op(X) ::= NEGATE .                                           { X = std::shared_p
 op(X) ::= OR .                                               { X = std::shared_ptr<OrOp> (new OrOp()); }
 // 6.1.1990
 op(X) ::= OVER .                                             { X = std::shared_ptr<OverOp> (new OverOp()); }
+// 6.1.2050
+op(X) ::= QUIT .                                            { X = std::shared_ptr<QuitOp> (new QuitOp()); }
 // 6.1.2060
 op(X) ::= FROMR .                                            { X = std::shared_ptr<FromReturnOp> (new FromReturnOp()); }
 // 6.1.2070
@@ -247,18 +249,12 @@ op(X) ::= LTUNSIGNED .                                       { X = std::shared_p
 op(X) ::= GTUNSIGNED .                                       { X = std::shared_ptr<GreaterThanUnsignedOp> (new GreaterThanUnsignedOp()); }
 // 6.1.2490
 op(X) ::= XOR .                                              { X = std::shared_ptr<ExclusiveOrOp> (new ExclusiveOrOp()); }
-
-
-
-
-
 // 6.2.0340
-//   2>R is in the compiler dictionary
+//   2>R is in the dictionary
 // 6.2.0410
-//   2R> is in the compiler dictionary
+//   2R> is in the dictionary
 // 6.2.0415
-//   2R@ is in the compiler dictionary
-
+//   2R@ is in the dictionary
 // 6.2.1930
 op(X) ::= NIP .                                              { X = std::shared_ptr<NipOp> (new NipOp()); }
 // 6.2.2300

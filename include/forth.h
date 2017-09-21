@@ -110,7 +110,7 @@ private:
   void blockPop();
   std::vector<llvm::BasicBlock *>
   blocks(unsigned int n, llvm::BasicBlock *InsertBefore = nullptr);
-  std::stack<llvm::BasicBlock *> leave_bbs;
+  std::deque<llvm::BasicBlock *> leave_bbs;
   llvm::BasicBlock *splitBasicBlock(const llvm::Twine &Name = "");
   void loopPush(llvm::PHINode *a);
   void loopPop();

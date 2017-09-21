@@ -49,13 +49,14 @@ void _nuf_runtime_print_c_n(int8_t i, uint64_t u) {
 }
 
 void _nuf_runtime_print_s(char *s) { fprintf(stdout, "%s ", s); }
-
 uint64_t _nuf_runtime_get_c() { return (uint64_t)getchar(); }
 void _nuf_runtime_put_c(uint64_t a) { putchar((int)a); }
 
 void _nuf();
+void _nuf_runtime_end() { exit(0); }
 
 int main(int argc, char *argv[]) {
   _nuf();
+  _nuf_runtime_end();
   return 0;
 }

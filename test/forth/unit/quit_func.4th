@@ -1,0 +1,3 @@
+: FOO 10 . CR QUIT ;
+FOO
+20 . CR

@@ -85,6 +85,7 @@ IO(I)
 IO(J)
 IO(Key)
 IO(Leave)
+IO(Quit)
 IO(Space)
 
 class UnaryOp : public Op {

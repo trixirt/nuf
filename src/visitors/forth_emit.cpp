@@ -240,6 +240,15 @@ void ForthEmitVisitor::visitor(AlignOp *a) { /* NOOP */
 }
 
 void ForthEmitVisitor::visitor(LeaveOp *a) { forth->op_br(forth->leaveGet()); }
+void ForthEmitVisitor::visitor(QuitOp *a) {
+  llvm::CallInst *call = nullptr;
+  std::string f = "_nuf_runtime_end";
+  call = forth->op_call(f);
+  if (call = nullptr) {
+    forth->x_error_info = f;
+    throw(Forth::RUNTIME_FUNCTION_ERROR);
+  }
+}
 
 void ForthEmitVisitor::visitor(Literal *a) {
   llvm::Constant *c =

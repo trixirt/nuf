@@ -567,6 +567,10 @@ bool Forth::emit(std::string output) {
       llvm::FunctionType::get(_t["v"], llvm::ArrayRef<llvm::Type *>({_t["c*"]}),
                               false),
       llvm::GlobalValue::LinkageTypes::ExternalLinkage, a, _mod);
+  a = "_nuf_runtime_end";
+  runtime_functions[a] = llvm::Function::Create(
+      llvm::FunctionType::get(_t["v"], llvm::ArrayRef<llvm::Type *>({}), false),
+      llvm::GlobalValue::LinkageTypes::ExternalLinkage, a, _mod);
 
   try {
     _program->accept(ev);
@@ -720,9 +724,9 @@ void Forth::syntaxError(const char *a, Code *b) {
   exit(-1);
 }
 
-void Forth::leavePush(llvm::BasicBlock *bb) { leave_bbs.push(bb); }
-void Forth::leavePop() { leave_bbs.pop(); }
-llvm::BasicBlock *Forth::leaveGet() { return leave_bbs.top(); }
+void Forth::leavePush(llvm::BasicBlock *bb) { leave_bbs.push_front(bb); }
+void Forth::leavePop() { leave_bbs.pop_front(); }
+llvm::BasicBlock *Forth::leaveGet() { return leave_bbs.front(); }
 
 std::string Forth::getEntryName() { return _entry_name; }
 void Forth::setEntryName(std::string a) { _entry_name = a; }

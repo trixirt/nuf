@@ -56,7 +56,7 @@ ws  = [ \r\t\f];
 nl  = [\n];
 alpha = [a-zA-Z];
 alphanum = [a-zA-Z0-9];
-alphanumspec = [!/*?_@a-zA-Z0-9];
+alphanumspec = [>!/*?_@a-zA-Z0-9];
 /* f12 3.4.1.3 Text interpretor input number conversion */
 binary_digit = [0-1];
 binary_number = "%"[-]?(binary_digit)(binary_digit)*;
@@ -160,6 +160,7 @@ word = alpha alphanum*;
     'NIP'          { *tokenid = FORTH_NIP;                   return empty();   }
     'OR'           { *tokenid = FORTH_OR;                    return empty();   }
     'OVER'         { *tokenid = FORTH_OVER;                  return empty();   }
+    'QUIT'         { *tokenid = FORTH_QUIT;                  return empty();   }
     'ROT'          { *tokenid = FORTH_ROT;                   return empty();   }
     'REPEAT'       { *tokenid = FORTH_REPEAT;                return empty();   }
     'RSHIFT'       { *tokenid = FORTH_RSHIFT;                return empty();   }

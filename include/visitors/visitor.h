@@ -104,6 +104,7 @@ class Over2Op;
 class PlusOp;
 class Program;
 class PushOp;
+class QuitOp;
 class RightShiftOp;
 class RotateOp;
 class SimpleStatement;
@@ -196,6 +197,7 @@ public:
   virtual void visitor(PlusOp *a) = 0;
   virtual void visitor(Program *a) = 0;
   virtual void visitor(PushOp *a) = 0;
+  virtual void visitor(QuitOp *a) = 0;
   virtual void visitor(RightShiftOp *a) = 0;
   virtual void visitor(RotateOp *a) = 0;
   virtual void visitor(SimpleStatement *a) = 0;
