@@ -96,7 +96,9 @@ word = alpha alphanum*;
     '."'           { goto string;                            }
     eof            { *tokenid = 0;                           return empty();   }
     nl             { *tokenid = FORTH_LF;      inc_lineno(); return comment();   }
-    '0<'           { *tokenid = FORTH_LTZERO;                return empty();   }	
+    '0<'           { *tokenid = FORTH_LTZERO;                return empty();   }
+    '0>'           { *tokenid = FORTH_GTZERO;                return empty();   }
+    '0<>'          { *tokenid = FORTH_NEQZERO;               return empty();   }	
     '0='           { *tokenid = FORTH_EQZERO;                return empty();   }
     '1+'           { *tokenid = FORTH_INC;                   return empty();   }
     '1-'           { *tokenid = FORTH_DEC;                   return empty();   }

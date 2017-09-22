@@ -73,6 +73,7 @@ public:
   virtual void visitor(FunctionDefinitionList *a);
   virtual void visitor(GreaterThanSignedOp *a);
   virtual void visitor(GreaterThanUnsignedOp *a);
+  virtual void visitor(GreaterThanZeroOp *a);
   virtual void visitor(HereOp *a);
   virtual void visitor(HexOp *a);
   virtual void visitor(IOp *a);
@@ -100,6 +101,7 @@ public:
   virtual void visitor(NegateOp *a);
   virtual void visitor(N *a);
   virtual void visitor(NipOp *a);
+  virtual void visitor(NotEqualsZeroOp *a);
   virtual void visitor(Number *a);
   virtual void visitor(Op *a);
   virtual void visitor(OrOp *a);

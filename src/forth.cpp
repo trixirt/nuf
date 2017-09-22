@@ -315,6 +315,12 @@ llvm::ICmpInst *Forth::op_equals(llvm::Value *a, llvm::Value *b) {
   return op;
 }
 
+llvm::ICmpInst *Forth::op_not_equals(llvm::Value *a, llvm::Value *b) {
+  llvm::ICmpInst *op = new llvm::ICmpInst(llvm::ICmpInst::ICMP_NE, a, b);
+  in(op);
+  return op;
+}
+
 llvm::ICmpInst *Forth::op_less_than_signed(llvm::Value *a, llvm::Value *b) {
   llvm::ICmpInst *op = new llvm::ICmpInst(llvm::ICmpInst::ICMP_SLT, a, b);
   in(op);

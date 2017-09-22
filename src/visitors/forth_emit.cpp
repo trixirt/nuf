@@ -227,6 +227,9 @@ void ForthEmitVisitor::visitor(CheckLoopStatement *a) {
   forth->blockReplace(bbs[END]);
 }
 
+void ForthEmitVisitor::visitor(AlignOp *a) { /* NOOP */
+}
+
 void ForthEmitVisitor::visitor(LoopStatement *a) {
   enum bv { LOOP, END };
   std::vector<llvm::BasicBlock *> bbs = forth->blocks(bv::END + 1);
@@ -236,19 +239,7 @@ void ForthEmitVisitor::visitor(LoopStatement *a) {
   forth->blockReplace(bbs[END]);
 }
 
-void ForthEmitVisitor::visitor(AlignOp *a) { /* NOOP */
-}
-
 void ForthEmitVisitor::visitor(LeaveOp *a) { forth->op_br(forth->leaveGet()); }
-void ForthEmitVisitor::visitor(QuitOp *a) {
-  llvm::CallInst *call = nullptr;
-  std::string f = "_nuf_runtime_end";
-  call = forth->op_call(f);
-  if (call = nullptr) {
-    forth->x_error_info = f;
-    throw(Forth::RUNTIME_FUNCTION_ERROR);
-  }
-}
 
 void ForthEmitVisitor::visitor(Literal *a) {
   llvm::Constant *c =
@@ -260,6 +251,16 @@ void ForthEmitVisitor::visitor(Number *a) {
   llvm::Constant *c =
       llvm::ConstantInt::get(forth->getStackElementType(), a->getNumber());
   forth->push(c);
+}
+
+void ForthEmitVisitor::visitor(QuitOp *a) {
+  llvm::CallInst *call = nullptr;
+  std::string f = "_nuf_runtime_end";
+  call = forth->op_call(f);
+  if (call == nullptr) {
+    forth->x_error_info = f;
+    throw(Forth::RUNTIME_FUNCTION_ERROR);
+  }
 }
 
 void ForthEmitVisitor::visitor(SimpleStatement *a) { a->stmt->accept(this); }
@@ -447,6 +448,14 @@ void ForthEmitVisitor::visitor(EqualsZeroOp *a) {
   llvm::Value *r = forth->op_select(cmp, forth->_ffff, forth->_zero);
   forth->push(r);
 }
+
+void ForthEmitVisitor::visitor(NotEqualsZeroOp *a) {
+  llvm::Value *v = forth->pop();
+  llvm::Value *cmp = forth->op_not_equals(v, forth->_zero);
+  llvm::Value *r = forth->op_select(cmp, forth->_ffff, forth->_zero);
+  forth->push(r);
+}
+
 void ForthEmitVisitor::visitor(ExclusiveOrOp *a) {
   llvm::Value *v1 = forth->pop();
   llvm::Value *v0 = forth->pop();
@@ -509,6 +518,13 @@ void ForthEmitVisitor::visitor(MultiplyOp *a) {
 void ForthEmitVisitor::visitor(LessThanZeroOp *a) {
   llvm::Value *v0 = forth->pop();
   llvm::Value *cmp = forth->op_less_than_signed(v0, forth->_zero);
+  llvm::Value *r = forth->op_select(cmp, forth->_ffff, forth->_zero);
+  forth->push(r);
+}
+
+void ForthEmitVisitor::visitor(GreaterThanZeroOp *a) {
+  llvm::Value *v0 = forth->pop();
+  llvm::Value *cmp = forth->op_greater_than_signed(v0, forth->_zero);
   llvm::Value *r = forth->op_select(cmp, forth->_ffff, forth->_zero);
   forth->push(r);
 }
@@ -649,19 +665,28 @@ void ForthEmitVisitor::visitor(TuckOp *a) {
   forth->push(v1);
 }
 
-void ForthEmitVisitor::visitor(StoreReturnOp *a) {
-  llvm::Value *v0 = forth->popR();
-  forth->pushR(v0);
-  forth->push(v0);
-}
-void ForthEmitVisitor::visitor(ToReturnOp *a) {
+void ForthEmitVisitor::visitor(FetchOp *a) {
   llvm::Value *v0 = forth->pop();
-  forth->pushR(v0);
+  llvm::Value *r = forth->fetch(v0);
+  forth->push(r);
 }
+
+void ForthEmitVisitor::visitor(FetchCOp *a) {
+  llvm::Value *v0 = forth->pop();
+  llvm::Value *r = forth->fetchC(v0);
+  forth->push(r);
+}
+
 void ForthEmitVisitor::visitor(FromReturnOp *a) {
   llvm::Value *v0 = forth->popR();
   forth->push(v0);
 }
+
+void ForthEmitVisitor::visitor(ToReturnOp *a) {
+  llvm::Value *v0 = forth->pop();
+  forth->pushR(v0);
+}
+
 void ForthEmitVisitor::visitor(StoreOp *a) {
   llvm::Value *v0 = forth->pop();
   llvm::Value *v1 = forth->pop();
@@ -672,6 +697,12 @@ void ForthEmitVisitor::visitor(StoreCOp *a) {
   llvm::Value *v0 = forth->pop();
   llvm::Value *v1 = forth->pop();
   forth->storeC(v0, v1);
+}
+
+void ForthEmitVisitor::visitor(StoreReturnOp *a) {
+  llvm::Value *v0 = forth->popR();
+  forth->pushR(v0);
+  forth->push(v0);
 }
 
 void ForthEmitVisitor::visitor(String *a) {
@@ -701,17 +732,6 @@ void ForthEmitVisitor::visitor(String *a) {
   } else {
     throw Forth::MEMORY;
   }
-}
-void ForthEmitVisitor::visitor(FetchOp *a) {
-  llvm::Value *v0 = forth->pop();
-  llvm::Value *r = forth->fetch(v0);
-  forth->push(r);
-}
-
-void ForthEmitVisitor::visitor(FetchCOp *a) {
-  llvm::Value *v0 = forth->pop();
-  llvm::Value *r = forth->fetchC(v0);
-  forth->push(r);
 }
 void ForthEmitVisitor::visitor(Constant *a) {
   auto i = forth->global_variables.find(a->name());

@@ -67,6 +67,7 @@ public:
   llvm::CallInst *op_call(std::string function_name, llvm::Value *a,
                           llvm::Value *b);
   llvm::ICmpInst *op_equals(llvm::Value *a, llvm::Value *b);
+  llvm::ICmpInst *op_not_equals(llvm::Value *a, llvm::Value *b);
   llvm::ICmpInst *op_greater_than_signed(llvm::Value *a, llvm::Value *b);
   llvm::ICmpInst *op_greater_than_unsigned(llvm::Value *a, llvm::Value *b);
   llvm::ICmpInst *op_less_than_signed(llvm::Value *a, llvm::Value *b);
