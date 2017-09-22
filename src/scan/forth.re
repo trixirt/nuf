@@ -108,6 +108,7 @@ word = alpha alphanum*;
     '2VARIABLE'    { *tokenid = FORTH_VARIABLE_TWO;          return empty();   }
     '<'            { *tokenid = FORTH_LTSIGNED;              return empty();   }
     '>'            { *tokenid = FORTH_GTSIGNED;              return empty();   }	
+    '<>'           { *tokenid = FORTH_NEQ;                   return empty();   }
     '+'            { *tokenid = FORTH_PLUS;                  return empty();   }
     '+LOOP'        { *tokenid = FORTH_LOOP_PLUS;             return empty();   }
     '*'            { *tokenid = FORTH_MUL;                   return empty();   }

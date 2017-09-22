@@ -97,6 +97,7 @@ class MultiplyDivideModuloOp;
 class N;
 class NegateOp;
 class NipOp;
+class NotEqualsOp;
 class NotEqualsZeroOp;
 class Number;
 class Op;
@@ -192,6 +193,7 @@ public:
   virtual void visitor(N *a) = 0;
   virtual void visitor(NegateOp *a) = 0;
   virtual void visitor(NipOp *a) = 0;
+  virtual void visitor(NotEqualsOp *a) = 0;
   virtual void visitor(NotEqualsZeroOp *a) = 0;
   virtual void visitor(Number *a) = 0;
   virtual void visitor(Op *a) = 0;

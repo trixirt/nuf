@@ -449,6 +449,14 @@ void ForthEmitVisitor::visitor(EqualsZeroOp *a) {
   forth->push(r);
 }
 
+void ForthEmitVisitor::visitor(NotEqualsOp *a) {
+  llvm::Value *v1 = forth->pop();
+  llvm::Value *v0 = forth->pop();
+  llvm::Value *cmp = forth->op_not_equals(v0, v1);
+  llvm::Value *r = forth->op_select(cmp, forth->_ffff, forth->_zero);
+  forth->push(r);
+}
+
 void ForthEmitVisitor::visitor(NotEqualsZeroOp *a) {
   llvm::Value *v = forth->pop();
   llvm::Value *cmp = forth->op_not_equals(v, forth->_zero);
@@ -477,41 +485,6 @@ void ForthEmitVisitor::visitor(LeftShiftOp *a) {
   llvm::Value *v1 = forth->pop();
   llvm::Value *v0 = forth->pop();
   llvm::Value *r = forth->op_leftshift(v0, v1);
-  forth->push(r);
-}
-
-void ForthEmitVisitor::visitor(MaxOp *a) {
-  llvm::Value *v1 = forth->pop();
-  llvm::Value *v0 = forth->pop();
-  llvm::Value *cmp = forth->op_greater_than_signed(v0, v1);
-  llvm::Value *r = forth->op_select(cmp, v0, v1);
-  forth->push(r);
-}
-
-void ForthEmitVisitor::visitor(MinOp *a) {
-  llvm::Value *v1 = forth->pop();
-  llvm::Value *v0 = forth->pop();
-  llvm::Value *cmp = forth->op_less_than_signed(v0, v1);
-  llvm::Value *r = forth->op_select(cmp, v0, v1);
-  forth->push(r);
-}
-
-void ForthEmitVisitor::visitor(MinusOp *a) {
-  llvm::Value *v1 = forth->pop();
-  llvm::Value *v0 = forth->pop();
-  llvm::Value *r = forth->op_minus(v0, v1);
-  forth->push(r);
-}
-void ForthEmitVisitor::visitor(ModuloOp *a) {
-  llvm::Value *v1 = forth->pop();
-  llvm::Value *v0 = forth->pop();
-  llvm::Value *r = forth->op_modulo(v0, v1);
-  forth->push(r);
-}
-void ForthEmitVisitor::visitor(MultiplyOp *a) {
-  llvm::Value *v1 = forth->pop();
-  llvm::Value *v0 = forth->pop();
-  llvm::Value *r = forth->op_multiply(v0, v1);
   forth->push(r);
 }
 
@@ -558,6 +531,41 @@ void ForthEmitVisitor::visitor(GreaterThanUnsignedOp *a) {
   llvm::Value *v0 = forth->pop();
   llvm::Value *cmp = forth->op_greater_than_unsigned(v0, v1);
   llvm::Value *r = forth->op_select(cmp, forth->_ffff, forth->_zero);
+  forth->push(r);
+}
+
+void ForthEmitVisitor::visitor(MaxOp *a) {
+  llvm::Value *v1 = forth->pop();
+  llvm::Value *v0 = forth->pop();
+  llvm::Value *cmp = forth->op_greater_than_signed(v0, v1);
+  llvm::Value *r = forth->op_select(cmp, v0, v1);
+  forth->push(r);
+}
+
+void ForthEmitVisitor::visitor(MinOp *a) {
+  llvm::Value *v1 = forth->pop();
+  llvm::Value *v0 = forth->pop();
+  llvm::Value *cmp = forth->op_less_than_signed(v0, v1);
+  llvm::Value *r = forth->op_select(cmp, v0, v1);
+  forth->push(r);
+}
+
+void ForthEmitVisitor::visitor(MinusOp *a) {
+  llvm::Value *v1 = forth->pop();
+  llvm::Value *v0 = forth->pop();
+  llvm::Value *r = forth->op_minus(v0, v1);
+  forth->push(r);
+}
+void ForthEmitVisitor::visitor(ModuloOp *a) {
+  llvm::Value *v1 = forth->pop();
+  llvm::Value *v0 = forth->pop();
+  llvm::Value *r = forth->op_modulo(v0, v1);
+  forth->push(r);
+}
+void ForthEmitVisitor::visitor(MultiplyOp *a) {
+  llvm::Value *v1 = forth->pop();
+  llvm::Value *v0 = forth->pop();
+  llvm::Value *r = forth->op_multiply(v0, v1);
   forth->push(r);
 }
 

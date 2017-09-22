@@ -101,6 +101,7 @@ public:
   virtual void visitor(NegateOp *a);
   virtual void visitor(N *a);
   virtual void visitor(NipOp *a);
+  virtual void visitor(NotEqualsOp *a);
   virtual void visitor(NotEqualsZeroOp *a);
   virtual void visitor(Number *a);
   virtual void visitor(Op *a);

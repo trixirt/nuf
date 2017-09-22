@@ -256,7 +256,7 @@ op(X) ::= XOR .                                              { X = std::shared_p
 // CORE-EXT
 //
 // 6.2.0260
-op(X) ::= NEQZERO .                                          { X = std::shared_ptr<NotEqualsZeroOp> (new NotEqualsZeroOp()); }
+op(X) ::= NEQZERO .                                          { X = std::shared_ptr<NotEqualsOp> (new NotEqualsOp()); }
 // 6.2.0280
 op(X) ::= GTZERO .                                           { X = std::shared_ptr<GreaterThanZeroOp> (new GreaterThanZeroOp()); }
 
@@ -266,6 +266,8 @@ op(X) ::= GTZERO .                                           { X = std::shared_p
 //   2R> is in the dictionary
 // 6.2.0415
 //   2R@ is in the dictionary
+// 6.2.0500
+op(X) ::= NEQ .                                              { X = std::shared_ptr<NotEqualsOp> (new NotEqualsOp()); }
 // 6.2.1930
 op(X) ::= NIP .                                              { X = std::shared_ptr<NipOp> (new NipOp()); }
 // 6.2.2300
