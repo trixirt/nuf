@@ -198,6 +198,8 @@ op(X) ::= DROP .                                             { X = std::shared_p
 op(X) ::= DUP .                                              { X = std::shared_ptr<DupOp> (new DupOp()); }
 // 6.1.1320
 op(X) ::= EMIT .                                             { X = std::shared_ptr<EmitOp> (new EmitOp()); }
+// 6.1.1380
+op(X) ::= EXIT .                                             { X = std::shared_ptr<ExitOp> (new ExitOp()); }
 // 6.1.1650
 op(X) ::= HERE .                                             { X = std::shared_ptr<HereOp> (new HereOp()); }
 // 6.1.1660

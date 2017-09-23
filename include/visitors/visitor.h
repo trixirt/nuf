@@ -60,6 +60,7 @@ class DropOp;
 class DupOp;
 class Dup2Op;
 class EmitOp;
+class ExitOp;
 class False;
 class FetchOp;
 class FetchCOp;
@@ -141,7 +142,6 @@ public:
   virtual void visitor(Comment *a) = 0;
   virtual void visitor(Constant *a) = 0;
   virtual void visitor(CrOp *a) = 0;
-  virtual void visitor(ExclusiveOrOp *a) = 0;
   virtual void visitor(CellPlusOp *a) = 0;
   virtual void visitor(CellsOp *a) = 0;
   virtual void visitor(DecOp *a) = 0;
@@ -156,6 +156,8 @@ public:
   virtual void visitor(Dup2Op *a) = 0;
   virtual void visitor(EmitOp *a) = 0;
   virtual void visitor(EqualsZeroOp *a) = 0;
+  virtual void visitor(ExclusiveOrOp *a) = 0;
+  virtual void visitor(ExitOp *a) = 0;
   virtual void visitor(False *a) = 0;
   virtual void visitor(FetchOp *a) = 0;
   virtual void visitor(FetchCOp *a) = 0;

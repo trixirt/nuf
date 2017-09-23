@@ -239,7 +239,18 @@ void ForthEmitVisitor::visitor(LoopStatement *a) {
   forth->blockReplace(bbs[END]);
 }
 
-void ForthEmitVisitor::visitor(LeaveOp *a) { forth->op_br(forth->leaveGet()); }
+void ForthEmitVisitor::visitor(LeaveOp *a) { forth->op_br(forth->getLeave()); }
+
+void ForthEmitVisitor::visitor(ExitOp *a) {
+    llvm::BasicBlock *e = forth->getExit();
+    llvm::BranchInst *br;
+    bool replace = true;
+    br = forth->op_br(e, replace);
+    /*
+     * XXX 
+     * THIS IS BROKEN
+     */
+}
 
 void ForthEmitVisitor::visitor(Literal *a) {
   llvm::Constant *c =

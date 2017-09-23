@@ -371,9 +371,19 @@ llvm::BranchInst *Forth::op_condbr(llvm::Value *a, llvm::BasicBlock *t,
   return op;
 }
 
-llvm::BranchInst *Forth::op_br(llvm::BasicBlock *b) {
+llvm::BranchInst *Forth::op_br(llvm::BasicBlock *b, bool replace) {
   llvm::BranchInst *op = llvm::BranchInst::Create(b);
+  if (replace) {
+      llvm::BasicBlock *bb = getBasicBlock();
+      llvm::TerminatorInst *ti = bb->getTerminator();
+      if (ti) {
+	  auto itr = bb->getInstList().end();
+	  itr--;
+	  bb->getInstList().erase(itr);
+      }
+  }
   te(op);
+
   return op;
 }
 
@@ -627,7 +637,7 @@ llvm::Function *Forth::startFunction(std::string n,
   std::vector<llvm::BasicBlock *> bbs = blocks(bv::EXIT + 1);
   bbs[ENTRY]->setName("Entry");
   bbs[EXIT]->setName("Exit");
-  leavePush(bbs[EXIT]);
+  exitPush(bbs[EXIT]);
   bbs[EXIT]->getInstList().push_back(llvm::ReturnInst::Create(ctx));
   blockPush(bbs[ENTRY]);
   op_br(bbs[EXIT]);
@@ -641,7 +651,7 @@ void Forth::startProgramFunction() {
 
 void Forth::endFunction() {
   blockPop();
-  leavePop();
+  exitPop();
   fs.pop_front();
 }
 
@@ -730,9 +740,25 @@ void Forth::syntaxError(const char *a, Code *b) {
   exit(-1);
 }
 
+void Forth::exitPush(llvm::BasicBlock *bb) { exit_bbs.push_front(bb); }
+void Forth::exitPop() { exit_bbs.pop_front(); }
+llvm::BasicBlock *Forth::getExit() {
+    llvm::BasicBlock *r = exit_bbs.front();
+    if (r == NULL) {
+	throw(EXIT);
+    }
+    return r;
+}
+
 void Forth::leavePush(llvm::BasicBlock *bb) { leave_bbs.push_front(bb); }
 void Forth::leavePop() { leave_bbs.pop_front(); }
-llvm::BasicBlock *Forth::leaveGet() { return leave_bbs.front(); }
+llvm::BasicBlock *Forth::getLeave() {
+    llvm::BasicBlock *r = leave_bbs.front();
+    if (r == NULL) {
+	throw(LEAVE);
+    }
+    return r;
+}
 
 std::string Forth::getEntryName() { return _entry_name; }
 void Forth::setEntryName(std::string a) { _entry_name = a; }
@@ -762,7 +788,7 @@ void Forth::moveTerminator(llvm::BasicBlock *a) {
       ti->removeFromParent();
       te(a, ti);
     } else {
-      printf("Ooops\n");
+	throw(MOVE_TERMINATOR);
     }
   }
 }

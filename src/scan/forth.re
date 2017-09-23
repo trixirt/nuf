@@ -44,7 +44,7 @@
 std::shared_ptr<N> forth_scanner::scan(int *tokenid) {
 
     m_pstart = m_p;
-    // fprintf(stderr, "m_p %p\n", m_p);
+    fprintf(stderr, "m_p %p\n", m_p);
 standard:
 
 /*!re2c
@@ -87,8 +87,6 @@ word = alpha alphanum*;
    keyword taken care of by compiler's dictionary
    ABS
  */
-
-//    '2!'           { *tokenid = FORTH_TWOSTORE;              return empty();   }
 
 /*!re2c
     '('            { goto comment;                          }
@@ -144,6 +142,7 @@ word = alpha alphanum*;
     'DUP'          { *tokenid = FORTH_DUP;                   return empty();   }
     'ELSE'         { *tokenid = FORTH_ELSE;                  return empty();   }
     'EMIT'         { *tokenid = FORTH_EMIT;                  return empty();   }
+    'EXIT'         { printf("mmmm\n"); *tokenid = FORTH_EXIT;                  return empty();   }
     'FALSE'        { *tokenid = FORTH_FALSE;                 return empty();   }    
     'HEX'          { *tokenid = FORTH_HEX;                   return empty();   }
     'HERE'         { *tokenid = FORTH_HERE;                  return empty();   }

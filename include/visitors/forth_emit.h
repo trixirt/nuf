@@ -64,6 +64,7 @@ public:
   virtual void visitor(EmitOp *a);
   virtual void visitor(EqualsZeroOp *a);
   virtual void visitor(ExclusiveOrOp *a);
+  virtual void visitor(ExitOp *a);
   virtual void visitor(False *a);
   virtual void visitor(FetchOp *a);
   virtual void visitor(FetchCOp *a);

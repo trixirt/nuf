@@ -82,7 +82,7 @@ public:
   llvm::BinaryOperator *op_or(llvm::Value *a, llvm::Value *b);
   llvm::BinaryOperator *op_plus(llvm::Value *a, llvm::Value *b);
   llvm::BinaryOperator *op_rightshift(llvm::Value *a, llvm::Value *b);
-  llvm::BranchInst *op_br(llvm::BasicBlock *b);
+  llvm::BranchInst *op_br(llvm::BasicBlock *b, bool replace = false);
   llvm::BranchInst *op_condbr(llvm::Value *a, llvm::BasicBlock *t,
                               llvm::BasicBlock *f);
   llvm::SelectInst *op_select(llvm::Value *c, llvm::Value *t, llvm::Value *f);
@@ -92,7 +92,11 @@ public:
 
   void leavePush(llvm::BasicBlock *bb);
   void leavePop();
-  llvm::BasicBlock *leaveGet();
+  llvm::BasicBlock *getLeave();
+
+  void exitPush(llvm::BasicBlock *bb);
+  void exitPop();
+  llvm::BasicBlock *getExit();
 
   std::string getEntryName();
   void setEntryName(std::string a);
@@ -111,6 +115,7 @@ private:
   void blockPop();
   std::vector<llvm::BasicBlock *>
   blocks(unsigned int n, llvm::BasicBlock *InsertBefore = nullptr);
+  std::deque<llvm::BasicBlock *> exit_bbs;
   std::deque<llvm::BasicBlock *> leave_bbs;
   llvm::BasicBlock *splitBasicBlock(const llvm::Twine &Name = "");
   void loopPush(llvm::PHINode *a);
@@ -180,6 +185,9 @@ private:
     SYNTAX_STRING,
     MEMORY,
     RUNTIME_FUNCTION_ERROR,
+    EXIT,
+    LEAVE,
+    MOVE_TERMINATOR,
     UNDEFINED_SYMBOL
   };
 };
