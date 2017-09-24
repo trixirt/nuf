@@ -1,0 +1,5 @@
+: FOO 11 . CR EXIT 12 . CR ; 
+
+10 . CR
+FOO
+13 . CR

@@ -242,14 +242,25 @@ void ForthEmitVisitor::visitor(LoopStatement *a) {
 void ForthEmitVisitor::visitor(LeaveOp *a) { forth->op_br(forth->getLeave()); }
 
 void ForthEmitVisitor::visitor(ExitOp *a) {
+    /*
+     * An EXIT can leave a dangling block.
+     *
+     * ...
+     * br label %Exit
+     *
+     * exit-leftovers:                                   ; No predecessors!
+     * ...
+     * br label %Exit
+     *
+     * Exit:
+     */
     llvm::BasicBlock *e = forth->getExit();
     llvm::BranchInst *br;
     bool replace = true;
+    llvm::BasicBlock *nbb = forth->splitBasicBlock("exit-leftovers");
     br = forth->op_br(e, replace);
-    /*
-     * XXX 
-     * THIS IS BROKEN
-     */
+    forth->blockPop();
+    forth->blockPush(nbb);
 }
 
 void ForthEmitVisitor::visitor(Literal *a) {
